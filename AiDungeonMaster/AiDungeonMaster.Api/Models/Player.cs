@@ -10,11 +10,12 @@ namespace AiDungeonMaster.Api.Models
         [Required]
         public string Name { get; set; } = "";
 
-        //public string? Email { get; set; }
+        public string? Email { get; set; }
+
+        public string? PasswordHash { get; set; }  // NEW
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // 1-n relationship: Player has many sessions
         public List<StorySession> Sessions { get; set; } = new();
     }
 }

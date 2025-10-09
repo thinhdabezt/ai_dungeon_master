@@ -1,7 +1,10 @@
 using AiDungeonMaster.Api.Data;
 using AiDungeonMaster.Api.IServices;
 using AiDungeonMaster.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace AiDungeonMaster.Api
 {
@@ -12,8 +15,10 @@ namespace AiDungeonMaster.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Database
+            //builder.Services.AddDbContext<AppDbContext>(options =>
+            //    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -42,6 +47,33 @@ namespace AiDungeonMaster.Api
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
+            });
+
+            // JWT Authentication
+            var jwtKey = builder.Configuration["Jwt:Key"];
+            var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+            var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+            var key = Encoding.UTF8.GetBytes(jwtKey);
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtIssuer,
+                    ValidAudience = jwtAudience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
             });
 
             var app = builder.Build();

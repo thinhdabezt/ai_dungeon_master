@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AiDungeonMaster.Api.Models;
 using AiDungeonMaster.Api.IServices;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AiDungeonMaster.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class StoryController : ControllerBase
     {
         private readonly IAIService _aiService;
