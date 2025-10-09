@@ -20,24 +20,17 @@ namespace AiDungeonMaster.Api
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Add services to the container.
+            // Core services
+            builder.Services.AddScoped<IPlayerService, PlayerService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<ISessionService, DbSessionService>();
+            builder.Services.AddSingleton<IThemeService, ThemeService>();
+            builder.Services.AddScoped<IAIService, GeminiAIService>();
+            builder.Services.AddHttpClient();
+
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            //Register HTTP client for AI services
-            builder.Services.AddHttpClient<GeminiAIService>();
-
-            //Add OpenRouter AI service
-            builder.Services.AddScoped<IAIService, GeminiAIService>();
-            //Add theme service
-            builder.Services.AddSingleton<IThemeService, ThemeService>();
-            //Add session service
-            builder.Services.AddScoped<ISessionService, DbSessionService>();
-
-            //Add player service
-            builder.Services.AddScoped<IPlayerService, PlayerService>();
 
             //Enable CORS for flutter app
             builder.Services.AddCors(options => {
@@ -53,6 +46,12 @@ namespace AiDungeonMaster.Api
             var jwtKey = builder.Configuration["Jwt:Key"];
             var jwtIssuer = builder.Configuration["Jwt:Issuer"];
             var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                throw new Exception("JWT Key is missing in configuration (Jwt:Key).");
+            }
+
 
             var key = Encoding.UTF8.GetBytes(jwtKey);
             builder.Services.AddAuthentication(options =>
@@ -87,6 +86,8 @@ namespace AiDungeonMaster.Api
 
             app.UseHttpsRedirection();
             app.UseCors("AllowFlutter");
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

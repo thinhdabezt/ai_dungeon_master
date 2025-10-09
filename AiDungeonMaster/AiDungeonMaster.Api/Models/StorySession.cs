@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AiDungeonMaster.Api.Models
 {
@@ -10,7 +9,7 @@ namespace AiDungeonMaster.Api.Models
 
         public string? ThemeKey { get; set; }
 
-        // Foreign key to Player
+        // player FK
         public int PlayerId { get; set; }
         public Player? Player { get; set; }
 

@@ -43,7 +43,6 @@ namespace AiDungeonMaster.Api.Services
             return created;
         }
 
-
         public void AddExchange(string sessionId, string playerInput, string dmResponse)
         {
             var messages = new List<StoryMessage>

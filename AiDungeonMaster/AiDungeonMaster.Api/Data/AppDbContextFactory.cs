@@ -17,7 +17,7 @@ namespace AiDungeonMaster.Api.Data
                 .Build();
 
             var connectionString = config.GetConnectionString("DefaultConnection");
-            optionsBuilder.UseNpgsql(connectionString); // <-- Use Npgsql for PostgreSQL
+            optionsBuilder.UseNpgsql(connectionString);
 
             return new AppDbContext(optionsBuilder.Options);
         }
