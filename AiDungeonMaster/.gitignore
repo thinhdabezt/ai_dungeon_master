@@ -1,0 +1,66 @@
+# ASP.NET Core .NET gitignore
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+
+# Database files
+*.db
+*.mdf
+*.ldf
+
+# Logs
+*.log
+
+# Publish results
+[Dd]ebug/
+[Rr]elease/
+build/
+
+# NuGet packages
+*.nupkg
+# NuGet restore
+**/packages/*
+# NuGet v3
+**/.nuget/packages/*
+
+# Entity Framework
+Migrations/
+
+# appsettings (secrets)
+AiDungeonMaster.Api/appsettings.json
+AiDungeonMaster.Api/appsettings.Development.json
+
+# Others
+TestResults/
+
+# Rider
+.idea/
+*.sln.iml
+
+# JetBrains
+*.DotSettings.user
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# Backup & temp files
+*.bak
+*.tmp
+~$*
+
+# OS generated files
+.DS_Store
+Thumbs.db
