@@ -1,4 +1,4 @@
-using AiDungeonMaster.Api.Data;
+﻿using AiDungeonMaster.Api.Data;
 using AiDungeonMaster.Api.IServices;
 using AiDungeonMaster.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -33,12 +33,19 @@ namespace AiDungeonMaster.Api
             builder.Services.AddSwaggerGen();
 
             //Enable CORS for flutter app
-            builder.Services.AddCors(options => {
+            builder.Services.AddCors(options =>
+            {
                 options.AddPolicy("AllowFlutter", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8080")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    policy.WithOrigins(
+                        "http://localhost:5173",
+                        "http://127.0.0.1:5173",
+                        "http://localhost:8080",
+                        "https://your-flutter-webapp-domain.web.app", //thêm domain deploy thật
+                        "https://your-flutter-domain.vercel.app"      //hoặc Flutter web hosting domain
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
                 });
             });
 
