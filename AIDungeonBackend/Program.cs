@@ -43,6 +43,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Auth Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
 
 // JWT Authentication
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!);

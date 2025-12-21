@@ -11,6 +11,9 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Theme> Themes { get; set; }
+    public DbSet<StorySession> StorySessions { get; set; }
+    public DbSet<SessionMessage> SessionMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,6 +25,10 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<Theme>()
+            .HasIndex(t => t.Key)
             .IsUnique();
     }
 }
