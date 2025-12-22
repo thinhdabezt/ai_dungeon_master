@@ -19,29 +19,17 @@ public class ThemesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetThemes()
     {
-        return Ok(await _context.Themes.ToListAsync());
+        var themes = await _context.Themes
+            .OrderBy(t => t.Id)
+            .ToListAsync();
+        return Ok(themes);
     }
 
-    [HttpPost("seed")]
-    public async Task<IActionResult> Seed()
+    [HttpGet("{key}")]
+    public async Task<IActionResult> GetTheme(string key)
     {
-        if (await _context.Themes.AnyAsync())
-        {
-            return Ok("Themes already seeded.");
-        }
-
-        var defaultTheme = new Theme
-        {
-            Key = "classic_high_fantasy",
-            Name = "Classic High Fantasy",
-            PersonaPrompt = "You are an epic High Fantasy Dungeon Master.",
-            Temperature = 0.8f,
-            MaxTokens = 2048
-        };
-
-        _context.Themes.Add(defaultTheme);
-        await _context.SaveChangesAsync();
-
-        return Ok("Seeded default theme.");
+        var theme = await _context.Themes.FirstOrDefaultAsync(t => t.Key == key);
+        if (theme == null) return NotFound();
+        return Ok(theme);
     }
 }
