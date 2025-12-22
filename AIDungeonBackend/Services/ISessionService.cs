@@ -9,5 +9,6 @@ public interface ISessionService
     Task<StorySession?> GetSessionAsync(Guid sessionId, Guid userId);
     Task<SessionMessage> AddUserMessageAsync(Guid sessionId, Guid userId, string content);
     Task<SessionMessage> AddDmMessageAsync(Guid sessionId, string content);
+    Task<SessionMessage> ProcessChatAsync(Guid sessionId, Guid userId, string playerInput);
     Task DeleteSessionAsync(Guid sessionId, Guid userId);
 }

@@ -73,7 +73,30 @@ public class SessionsController : ControllerBase
         await _sessionService.DeleteSessionAsync(id, GetUserId());
         return NoContent();
     }
+
+    [HttpPost("{id}/chat")]
+    public async Task<IActionResult> Chat(Guid id, [FromBody] ChatRequestDto dto)
+    {
+        try
+        {
+            var message = await _sessionService.ProcessChatAsync(id, GetUserId(), dto.Input);
+            return Ok(message);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound("Session not found.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (HttpRequestException ex)
+        {
+            return StatusCode(503, ex.Message); // Service Unavailable for AI errors
+        }
+    }
 }
 
 public record CreateSessionDto(string Title, string ThemeKey);
 public record MessageDto(string Content);
+public record ChatRequestDto(string Input);
