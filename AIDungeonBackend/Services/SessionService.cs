@@ -20,10 +20,25 @@ public class SessionService : ISessionService
 
     public async Task<SessionMessage> ProcessChatAsync(Guid sessionId, Guid userId, string playerInput, bool includeHint = false)
     {
-        // 1. Check user settings if includeHint is explicitly requested OR defaults to user preference
-        // Requirement: "Chat endpoint accepts includeHint boolean". We will trust the controller/parameter.
-        // We could also auto-enable if user settings say so, but usually frontend drives the "per request" logic based on settings.
-        // Let's assume the controller passed the resolved boolean.
+        // 1. Check User Daily Quota
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) throw new UnauthorizedAccessException("User not found.");
+
+        const int DAILY_TOKEN_LIMIT = 50000;
+        
+        // Reset quota if new day
+        if (DateTime.UtcNow.Date > user.LastTokenReset.Date)
+        {
+            user.DailyTokenUsage = 0;
+            user.LastTokenReset = DateTime.UtcNow;
+            // Save happens later or now? Let's save now to be safe or just track objects
+            // EF Core tracking will handle it when we call SaveChangesAsync later.
+        }
+
+        if (user.DailyTokenUsage >= DAILY_TOKEN_LIMIT)
+        {
+            throw new InvalidOperationException("Daily token limit exceeded. Please try again tomorrow.");
+        }
 
         // 2. Add User Message
         await AddUserMessageAsync(sessionId, userId, playerInput);
@@ -59,9 +74,15 @@ public class SessionService : ISessionService
         }
 
         // 6. Call AI
-        var rawResponse = await _geminiService.GenerateContentAsync(systemPrompt, historyForAi, playerInput);
+        var (rawResponse, inputTokens, outputTokens) = await _geminiService.GenerateContentAsync(systemPrompt, historyForAi, playerInput);
 
-        // 7. Parse Response (Extract Hint)
+        // 7. Update User Usage
+        int totalTokens = inputTokens + outputTokens;
+        user.DailyTokenUsage += totalTokens;
+        // user is already tracked by context from FindAsync above if we used the same context? 
+        // Wait, FindAsync attaches it. But we verified 'user' is attached.
+        
+        // 8. Parse Response (Extract Hint)
         string storyContent = rawResponse;
         string? hintContent = null;
 
@@ -79,9 +100,12 @@ public class SessionService : ISessionService
             }
         }
 
-        // 8. Persist DM Response
-        var dmMessage = await AddDmMessageAsync(sessionId, storyContent, hintContent);
+        // 9. Persist DM Response with Token Count
+        var dmMessage = await AddDmMessageAsync(sessionId, storyContent, hintContent, totalTokens);
 
+        // Save changes to User (quota) and Message
+        // AddDmMessageAsync calls SaveChangesAsync. 
+        // EF Core will commit the User changes too since they share the context scope.
         return dmMessage;
     }
 
@@ -146,17 +170,18 @@ public class SessionService : ISessionService
 
     public async Task<SessionMessage> AddDmMessageAsync(Guid sessionId, string content)
     {
-        return await AddDmMessageAsync(sessionId, content, null);
+        return await AddDmMessageAsync(sessionId, content, null, 0);
     }
 
-    private async Task<SessionMessage> AddDmMessageAsync(Guid sessionId, string content, string? hint)
+    private async Task<SessionMessage> AddDmMessageAsync(Guid sessionId, string content, string? hint, int tokenCount)
     {
          var message = new SessionMessage
         {
             SessionId = sessionId,
             Role = "dm",
             Content = content,
-            Hint = hint
+            Hint = hint,
+            TokenCount = tokenCount
         };
 
         _context.SessionMessages.Add(message);

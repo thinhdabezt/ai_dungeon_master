@@ -8,6 +8,8 @@ using Polly;
 using Polly.Extensions.Http;
 using System.Net.Http;
 using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -95,6 +97,23 @@ builder.Services.AddCors(options =>
 // Health Checks
 builder.Services.AddHealthChecks();
 
+// Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    options.AddPolicy("FixedUserPolicy", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 10,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -107,6 +126,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowDev");
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -122,7 +142,7 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedAsync(context);
 }
 
-app.MapControllers();
+app.MapControllers().RequireRateLimiting("FixedUserPolicy");
 app.MapHealthChecks("/health");
 
 app.Run();

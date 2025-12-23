@@ -20,5 +20,8 @@ public class User
 
     public bool HintEnabled { get; set; } = false;
 
+    public int DailyTokenUsage { get; set; } = 0;
+    public DateTime LastTokenReset { get; set; } = DateTime.UtcNow;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

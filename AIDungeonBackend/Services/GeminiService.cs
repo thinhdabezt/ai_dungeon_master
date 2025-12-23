@@ -18,7 +18,7 @@ public class GeminiService : IGeminiService
         _configuration = configuration;
     }
 
-    public async Task<string> GenerateContentAsync(string systemPrompt, List<SessionMessage> history, string newUserInput)
+    public async Task<(string Content, int InputTokens, int OutputTokens)> GenerateContentAsync(string systemPrompt, List<SessionMessage> history, string newUserInput)
     {
         var apiKey = _configuration["Gemini:ApiKey"];
         var model = _configuration["Gemini:Model"] ?? "gemini-1.5-flash";
@@ -93,9 +93,18 @@ public class GeminiService : IGeminiService
                 .GetProperty("content")
                 .GetProperty("parts")[0]
                 .GetProperty("text")
-                .GetString();
+                .GetString() ?? "";
+
+            int promptTokens = 0;
+            int candidatesTokens = 0;
+
+            if (document.RootElement.TryGetProperty("usageMetadata", out var usage))
+            {
+                if (usage.TryGetProperty("promptTokenCount", out var pt)) promptTokens = pt.GetInt32();
+                if (usage.TryGetProperty("candidatesTokenCount", out var ct)) candidatesTokens = ct.GetInt32();
+            }
                 
-            return text ?? "";
+            return (text, promptTokens, candidatesTokens);
         }
         catch (Exception ex)
         {

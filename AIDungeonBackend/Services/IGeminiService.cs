@@ -4,5 +4,5 @@ namespace AIDungeonBackend.Services;
 
 public interface IGeminiService
 {
-    Task<string> GenerateContentAsync(string systemPrompt, List<SessionMessage> history, string newUserInput);
+    Task<(string Content, int InputTokens, int OutputTokens)> GenerateContentAsync(string systemPrompt, List<SessionMessage> history, string newUserInput);
 }
