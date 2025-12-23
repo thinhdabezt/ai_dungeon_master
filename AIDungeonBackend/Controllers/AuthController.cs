@@ -45,9 +45,25 @@ public class AuthController : ControllerBase
         var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
         var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
 
+        // Note: For now we don't return HintEnabled in /me, but we could.
+        // Let's stick to the essentials or update if frontend needs it.
         return Ok(new { Id = userId, Username = username, Email = email });
+    }
+
+    [Authorize]
+    [HttpPatch("settings")]
+    public async Task<IActionResult> UpdateSettings([FromBody] UserSettingsDto dto)
+    {
+        var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var success = await _authService.UpdateSettingsAsync(userId, dto.HintEnabled);
+        if (!success) return NotFound("User not found.");
+
+        return Ok(new { Message = "Settings updated successfully." });
     }
 }
 
 public record RegisterDto(string Username, string Email, string Password);
 public record LoginDto(string UsernameOrEmail, string Password);
+public record UserSettingsDto(bool HintEnabled);

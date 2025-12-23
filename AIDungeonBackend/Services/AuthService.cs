@@ -74,4 +74,17 @@ public class AuthService : IAuthService
 
         return (accessToken, refreshToken);
     }
+
+    public async Task<bool> UpdateSettingsAsync(Guid userId, bool hintEnabled)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        user.HintEnabled = hintEnabled;
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

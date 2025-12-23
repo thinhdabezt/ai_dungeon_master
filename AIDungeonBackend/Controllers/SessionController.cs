@@ -79,7 +79,7 @@ public class SessionsController : ControllerBase
     {
         try
         {
-            var message = await _sessionService.ProcessChatAsync(id, GetUserId(), dto.Input);
+            var message = await _sessionService.ProcessChatAsync(id, GetUserId(), dto.Input, dto.IncludeHint);
             return Ok(message);
         }
         catch (KeyNotFoundException)
@@ -99,4 +99,4 @@ public class SessionsController : ControllerBase
 
 public record CreateSessionDto(string Title, string ThemeKey);
 public record MessageDto(string Content);
-public record ChatRequestDto(string Input);
+public record ChatRequestDto(string Input, bool IncludeHint = false);

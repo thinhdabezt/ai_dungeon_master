@@ -18,5 +18,7 @@ public class User
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
+    public bool HintEnabled { get; set; } = false;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

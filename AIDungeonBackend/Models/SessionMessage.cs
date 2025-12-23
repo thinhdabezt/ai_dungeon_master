@@ -20,5 +20,7 @@ public class SessionMessage
 
     public int? TokenCount { get; set; }
 
+    public string? Hint { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
