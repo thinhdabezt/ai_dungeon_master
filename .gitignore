@@ -52,3 +52,44 @@ local.settings.json
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# ----------------------------
+# Flutter / Dart / Mobile
+# ----------------------------
+
+# Miscellaneous
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+pubspec.lock
+
+# Android
+android/app/libs/
+android/idea/
+android/.gradle/
+android/app/src/main/assets/
+android/app/google-services.json
+android/key.properties
+android/local.properties
+
+# iOS
+ios/Runner/Assets.xcassets/AppIcon.appiconset/
+ios/Runner/GeneratedPluginRegistrant.m
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/ServiceDefinitions.json
+ios/Runner/GoogleService-Info.plist
+
+# Web
+lib/generated_plugin_registrant.dart
+
+# IntelliJ / Android Studio
+*.iml
+.idea/
