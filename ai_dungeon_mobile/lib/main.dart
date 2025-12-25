@@ -9,6 +9,10 @@ import 'features/auth/services/auth_service.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
 import 'features/splash/splash_screen.dart';
+import 'features/sessions/providers/session_provider.dart';
+import 'features/sessions/services/session_service.dart';
+import 'features/sessions/screens/sessions_list_screen.dart';
+import 'features/sessions/screens/new_session_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +28,15 @@ class MyApp extends StatelessWidget {
     final storageService = SecureStorageService();
     final apiClient = ApiClient(storageService);
     final authService = AuthService(apiClient);
+    final sessionService = SessionService(apiClient);
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
           create: (_) => AuthProvider(authService, storageService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SessionProvider(sessionService),
         ),
       ],
       child: const AppRouter(),
@@ -58,7 +66,11 @@ class AppRouter extends StatelessWidget {
         ),
         GoRoute(
           path: '/home',
-          builder: (context, state) => const PlaceholderHomeScreen(),
+          builder: (context, state) => const SessionsListScreen(),
+        ),
+        GoRoute(
+          path: '/sessions/new',
+          builder: (context, state) => const NewSessionScreen(),
         ),
       ],
     );
@@ -72,35 +84,3 @@ class AppRouter extends StatelessWidget {
   }
 }
 
-class PlaceholderHomeScreen extends StatelessWidget {
-  const PlaceholderHomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthProvider>().logout();
-              context.go('/login');
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Welcome, ${auth.currentUser?.username ?? "Traveller"}!'),
-            const SizedBox(height: 16),
-            const Text('Start your adventure... (Coming soon)'),
-          ],
-        ),
-      ),
-    );
-  }
-}
