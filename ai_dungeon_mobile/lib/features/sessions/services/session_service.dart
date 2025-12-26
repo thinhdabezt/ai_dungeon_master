@@ -56,6 +56,17 @@ class SessionService {
     }
   }
 
+  Future<void> renameSession(String id, String newTitle) async {
+    try {
+      await _apiClient.dio.patch(
+        '/sessions/$id/title',
+        data: {'newTitle': newTitle},
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Fetches messages for a specific session.
   /// Note: Verify if backend has a dedicated endpoint or if we need to expand GET /sessions/{id}.
   /// As per B3: endpoint GET /api/sessions/{id} returns StorySessionDto which likely includes Messages.

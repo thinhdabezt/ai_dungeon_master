@@ -81,6 +81,36 @@ class SessionProvider extends ChangeNotifier {
       _errorMessage = 'Failed to delete session: $e';
       notifyListeners();
     }
+    }
+
+
+  Future<void> renameSession(String id, String newTitle) async {
+    final index = _sessions.indexWhere((s) => s.id == id);
+    if (index == -1) return;
+
+    final oldSession = _sessions[index];
+    // Create new session object with updated title to trigger selector updates if any (immutable style)
+    // Actually SessionModel fields are final, so we prefer creating a new instance or using copyWith if it existed.
+    // Let's create a new instance manually for now or just trust loadSessions?
+    // Optimistic update:
+    // We don't have copyWith, so let's skip deep immutable update and arguably "mutate" if we removed final? No.
+    // We will refresh the list or wait.
+    // Better: Add copyWith to SessionModel later. For now, we will just fetch list again or hack it.
+    // Let's assume we implement copyWith or just generic field update if we can't.
+    // Wait, let's implement copyWith on SessionModel first or just refetch.
+    // Refetching is safer but slower. 
+    // Let's optimistic update by replacing the item in the list.
+    
+    // We'll modify SessionModel to have copyWith in a sec.
+    
+    try {
+      await _sessionService.renameSession(id, newTitle);
+      // If success, reload
+      await loadSessions();
+    } catch (e) {
+      _errorMessage = 'Failed to rename session: $e';
+      notifyListeners();
+    }
   }
 
   void _setLoading(bool value) {

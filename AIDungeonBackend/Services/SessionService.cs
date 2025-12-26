@@ -198,4 +198,14 @@ public class SessionService : ISessionService
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task RenameSessionAsync(Guid sessionId, Guid userId, string newTitle)
+    {
+        var session = await _context.StorySessions.FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId);
+        if (session == null) throw new KeyNotFoundException("Session not found or access denied.");
+        
+        session.Title = newTitle;
+        session.LastUpdated = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+    }
 }

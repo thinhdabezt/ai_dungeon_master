@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../sessions/services/session_service.dart';
 import '../models/message_model.dart';
 
@@ -76,5 +77,25 @@ class ChatProvider extends ChangeNotifier {
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
+  }
+  Future<void> exportTranscript() async {
+    if (_messages.isEmpty) return;
+
+    final sb = StringBuffer();
+    sb.writeln('Adventure Transcript');
+    sb.writeln('-------------------');
+    sb.writeln();
+
+    for (final msg in _messages) {
+      if (msg.isUser) {
+        sb.writeln('**Player**: ${msg.content}');
+      } else {
+        sb.writeln('**DM**: ${msg.content}');
+      }
+      sb.writeln();
+    }
+
+    final transcript = sb.toString();
+    await Share.share(transcript, subject: 'AI Dungeon Transcript');
   }
 }

@@ -154,6 +154,46 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
                 session.title,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
+              trailing: PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, size: 20),
+                onSelected: (value) {
+                  if (value == 'rename') {
+                      _showRenameDialog(context, session, provider);
+                  } else if (value == 'delete') {
+                    // Trigger dismiss logic or separate delete implementation if requested
+                    // For now, swipe is main delete, but we can allow menu delete.
+                    // Let's implement menu delete confirm.
+                    showDialog(
+                      context: context,
+                       builder: (ctx) => AlertDialog(
+                        title: const Text('Delete Adventure?'),
+                        content: Text('Are you sure you want to delete "${session.title}"?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              child: const Text('Cancel')),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(ctx).pop();
+                                provider.deleteSession(session.id);
+                              },
+                              child: const Text('Delete', style: TextStyle(color: Colors.red))),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                itemBuilder: (context) => [
+                   const PopupMenuItem(
+                    value: 'rename',
+                    child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Rename')]),
+                   ),
+                   const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(children: [Icon(Icons.delete, size: 18, color: Colors.red), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
+                   ),
+                ],
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -184,6 +224,41 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
           ).animate().fadeIn(duration: 400.ms, delay: (50 * index).ms).slideX(),
         );
       },
+    );
+  }
+
+
+  void _showRenameDialog(BuildContext context, dynamic session, SessionProvider provider) {
+    final controller = TextEditingController(text: session.title);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rename Adventure'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'New Title'),
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final newTitle = controller.text.trim();
+              if (newTitle.isNotEmpty && newTitle != session.title) {
+                Navigator.of(ctx).pop();
+                await provider.renameSession(session.id, newTitle);
+              } else {
+                Navigator.of(ctx).pop();
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
     );
   }
 }

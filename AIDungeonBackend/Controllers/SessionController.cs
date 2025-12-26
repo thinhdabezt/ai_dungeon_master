@@ -90,12 +90,26 @@ public class SessionsController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (HttpRequestException ex)
-        {
             return StatusCode(503, ex.Message); // Service Unavailable for AI errors
         }
     }
+
+    [HttpPatch("{id}/title")]
+    public async Task<IActionResult> RenameSession(Guid id, [FromBody] RenameSessionDto dto)
+    {
+        try
+        {
+            await _sessionService.RenameSessionAsync(id, GetUserId(), dto.NewTitle);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
 }
+
+public record RenameSessionDto(string NewTitle);
 
 public record CreateSessionDto(string Title, string ThemeKey);
 public record MessageDto(string Content);
