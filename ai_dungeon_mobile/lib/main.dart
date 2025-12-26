@@ -13,6 +13,8 @@ import 'features/sessions/providers/session_provider.dart';
 import 'features/sessions/services/session_service.dart';
 import 'features/sessions/screens/sessions_list_screen.dart';
 import 'features/sessions/screens/new_session_screen.dart';
+import 'features/chat/providers/chat_provider.dart';
+import 'features/chat/screens/chat_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +39,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => SessionProvider(sessionService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ChatProvider(sessionService),
         ),
       ],
       child: const AppRouter(),
@@ -72,6 +77,14 @@ class AppRouter extends StatelessWidget {
           path: '/sessions/new',
           builder: (context, state) => const NewSessionScreen(),
         ),
+        GoRoute(
+          path: '/sessions/:id',
+          builder: (context, state) {
+            final id = state.pathParameters['id']!;
+            final title = state.extra as String?;
+            return ChatScreen(sessionId: id, title: title);
+          },
+        ),
       ],
     );
 
@@ -83,4 +96,5 @@ class AppRouter extends StatelessWidget {
     );
   }
 }
+
 

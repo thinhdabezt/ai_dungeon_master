@@ -55,4 +55,31 @@ class SessionService {
       rethrow;
     }
   }
+
+  /// Fetches messages for a specific session.
+  /// Note: Verify if backend has a dedicated endpoint or if we need to expand GET /sessions/{id}.
+  /// As per B3: endpoint GET /api/sessions/{id} returns StorySessionDto which likely includes Messages.
+  Future<SessionModel> getSession(String id) async {
+    try {
+      final response = await _apiClient.dio.get('/sessions/$id');
+      return SessionModel.fromJson(response.data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Sends a chat message.
+  /// Returns the AI's response as a SessionMessage (or compatible DTO).
+  Future<Map<String, dynamic>> sendChat(String sessionId, Map<String, dynamic> dto) async {
+    try {
+      final response = await _apiClient.dio.post(
+        '/sessions/$sessionId/chat',
+        data: dto,
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
+

@@ -47,7 +47,7 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createSession(String title, String themeKey) async {
+  Future<SessionModel?> createSession(String title, String themeKey) async {
     _setLoading(true);
     try {
       final dto = CreateSessionDto(title: title, themeKey: themeKey);
@@ -55,11 +55,11 @@ class SessionProvider extends ChangeNotifier {
       _sessions.insert(0, newSession);
       _errorMessage = null;
       notifyListeners();
-      return true;
+      return newSession;
     } catch (e) {
       _errorMessage = 'Failed to create session: $e';
       notifyListeners();
-      return false;
+      return null;
     } finally {
       _setLoading(false);
     }

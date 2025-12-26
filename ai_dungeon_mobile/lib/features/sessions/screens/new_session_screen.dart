@@ -33,13 +33,17 @@ class _NewSessionScreenState extends State<NewSessionScreen> {
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate() && _selectedTheme != null) {
-      final success = await context.read<SessionProvider>().createSession(
+      final newSession = await context.read<SessionProvider>().createSession(
             _titleController.text.trim(),
             _selectedTheme!.key,
           );
       
-      if (success && mounted) {
-        context.pop(); // Go back to list
+      if (newSession != null && mounted) {
+        context.go('/'); // Clear stack to home? Or just go to home then push?
+        // Better: Replace with home then push details, or simply push replacement if we want back button to go to home.
+        // Let's use go('/home') then push.
+        context.go('/home'); 
+        context.push('/sessions/${newSession.id}', extra: newSession.title);
       } else if (mounted) {
         final error = context.read<SessionProvider>().errorMessage;
         ScaffoldMessenger.of(context).showSnackBar(

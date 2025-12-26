@@ -175,10 +175,9 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
                 ],
               ),
               onTap: () {
-                // Navigate to Chat Screen (Milestone F3)
-                // For now show snackbar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Opening adventure...')),
+                context.push(
+                  '/sessions/${session.id}',
+                  extra: session.title,
                 );
               },
             ),

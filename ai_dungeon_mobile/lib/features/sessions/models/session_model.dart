@@ -1,3 +1,5 @@
+import '../../chat/models/message_model.dart';
+
 class SessionModel {
   final String id;
   final String userId;
@@ -5,6 +7,7 @@ class SessionModel {
   final String themeKey;
   final DateTime createdAt;
   final DateTime lastUpdated;
+  final List<MessageModel> messages;
 
   SessionModel({
     required this.id,
@@ -13,6 +16,7 @@ class SessionModel {
     required this.themeKey,
     required this.createdAt,
     required this.lastUpdated,
+    this.messages = const [],
   });
 
   factory SessionModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,11 @@ class SessionModel {
       themeKey: json['themeKey'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       lastUpdated: DateTime.parse(json['lastUpdated'] as String),
+      messages: (json['messages'] as List<dynamic>?)
+              ?.map((e) => MessageModel.fromJson(e))
+              .toList() ??
+          [],
     );
   }
 }
+
