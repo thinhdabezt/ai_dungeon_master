@@ -15,6 +15,7 @@ import 'features/sessions/screens/sessions_list_screen.dart';
 import 'features/sessions/screens/new_session_screen.dart';
 import 'features/chat/providers/chat_provider.dart';
 import 'features/chat/screens/chat_screen.dart';
+import 'core/storage/cache_service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,9 +29,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Dependency Injection
     final storageService = SecureStorageService();
+    final cacheService = CacheService();
     final apiClient = ApiClient(storageService);
     final authService = AuthService(apiClient);
-    final sessionService = SessionService(apiClient);
+    final sessionService = SessionService(apiClient, cacheService);
 
     return MultiProvider(
       providers: [

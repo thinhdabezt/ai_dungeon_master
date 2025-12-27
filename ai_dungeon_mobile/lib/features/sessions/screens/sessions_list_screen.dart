@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../core/utils/theme_utils.dart';
 import '../providers/session_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -144,10 +145,11 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               leading: CircleAvatar(
-                backgroundColor: Theme.of(context).primaryColor.withAlpha(50),
-                child: Text(
-                  session.themeKey.substring(0, 1).toUpperCase(),
-                  style: TextStyle(color: Theme.of(context).primaryColor),
+                backgroundColor: ThemeUtils.getThemeColor(session.themeKey, context).withAlpha(50),
+                child: Icon(
+                  ThemeUtils.getThemeIcon(session.themeKey),
+                  color: ThemeUtils.getThemeColor(session.themeKey, context),
+                  size: 20,
                 ),
               ),
               title: Text(

@@ -16,24 +16,29 @@ class MessageModel {
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
-    // Backend 'Role' enum: User = 0, DungeonMaster = 1, System = 2
-    // We'll treat DM and System as !isUser
-    // The backend might return 'Role' as integer or string depending on serializer
-    // Let's assume int based on standard EF Core, or check DTOs.
-    // Actually, looking at previous DTOs, it acts as a standard JSON return.
-    
     final role = json['role'];
-    final isUser = (role == 0 || role == 'User'); 
+    // Handle 'player' string (from backend) or legacy 0/1/User
+    final isUser = (role == 'player' || role == 'User' || role == 0); 
     
     return MessageModel(
       id: json['id']?.toString(),
       content: json['content'] ?? '',
       isUser: isUser,
       hint: json['hint'],
-      timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
+      timestamp: DateTime.tryParse(json['createdAt'] ?? json['timestamp'] ?? '') ?? DateTime.now(), // Backend uses CreatedAt
       tokenCount: json['tokenCount'] ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'content': content,
+    'role': isUser ? 'player' : 'dm',
+    'hint': hint,
+    'timestamp': timestamp.toIso8601String(),
+    'createdAt': timestamp.toIso8601String(),
+    'tokenCount': tokenCount,
+  };
 }
 
 class ChatRequestDto {

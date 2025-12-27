@@ -33,5 +33,15 @@ class SessionModel {
           [],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'userId': userId,
+    'title': title,
+    'themeKey': themeKey,
+    'createdAt': createdAt.toIso8601String(),
+    'lastUpdated': lastUpdated.toIso8601String(),
+    'messages': messages.map((e) => e.toJson()).toList(),
+  };
 }
 

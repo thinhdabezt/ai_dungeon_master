@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../core/utils/theme_utils.dart';
 import '../providers/session_provider.dart';
 import '../models/theme_model.dart'; // Import ThemeModel
 
@@ -150,7 +151,7 @@ class _NewSessionScreenState extends State<NewSessionScreen> {
                           children: [
                             // Placeholder Icon/Image based on theme name logic or generic
                             Icon(
-                              _getThemeIcon(theme.key),
+                              ThemeUtils.getThemeIcon(theme.key),
                               size: 32,
                               color: isSelected ? Theme.of(context).primaryColor : Colors.white70,
                             ),
@@ -205,20 +206,5 @@ class _NewSessionScreenState extends State<NewSessionScreen> {
         ),
       ),
     );
-  }
-
-  IconData _getThemeIcon(String key) {
-    switch (key.toLowerCase()) {
-      case 'fantasy': return Icons.auto_awesome;
-      case 'sci-fi': return Icons.rocket_launch;
-      case 'mystery': return Icons.search;
-      case 'horror': return Icons.local_fire_department; // or something scary
-      case 'steampunk': return Icons.settings;
-      case 'cyberpunk': return Icons.memory;
-      case 'historical': return Icons.history_edu;
-      case 'post-apocalyptic': return Icons.warning;
-      case 'western': return Icons.explore; // temporary
-      default: return Icons.category;
-    }
   }
 }

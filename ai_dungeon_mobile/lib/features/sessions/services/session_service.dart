@@ -1,4 +1,4 @@
-
+import '../../../core/storage/cache_service.dart';
 import '../../../core/network/api_client.dart';
 import '../models/create_session_dto.dart';
 import '../models/session_model.dart';
@@ -6,15 +6,20 @@ import '../models/theme_model.dart';
 
 class SessionService {
   final ApiClient _apiClient;
+  final CacheService _cacheService;
 
-  SessionService(this._apiClient);
+  SessionService(this._apiClient, this._cacheService);
 
   Future<List<ThemeModel>> getThemes() async {
     try {
       final response = await _apiClient.dio.get('/themes');
       final List<dynamic> data = response.data;
-      return data.map((json) => ThemeModel.fromJson(json)).toList();
+      final themes = data.map((json) => ThemeModel.fromJson(json)).toList();
+      _cacheService.saveThemes(themes);
+      return themes;
     } catch (e) {
+      final cached = await _cacheService.getThemes();
+      if (cached.isNotEmpty) return cached;
       rethrow;
     }
   }
@@ -30,8 +35,12 @@ class SessionService {
       // Actually Controller says: return Ok(sessions); where sessions is List<StorySessionDto>.
       
       final List<dynamic> data = response.data;
-      return data.map((json) => SessionModel.fromJson(json)).toList();
+      final sessions = data.map((json) => SessionModel.fromJson(json)).toList();
+      _cacheService.saveSessions(sessions);
+      return sessions;
     } catch (e) {
+      final cached = await _cacheService.getSessions();
+      if (cached.isNotEmpty) return cached;
       rethrow;
     }
   }
@@ -73,8 +82,12 @@ class SessionService {
   Future<SessionModel> getSession(String id) async {
     try {
       final response = await _apiClient.dio.get('/sessions/$id');
-      return SessionModel.fromJson(response.data);
+      final session = SessionModel.fromJson(response.data);
+      _cacheService.saveSessionDetail(session);
+      return session;
     } catch (e) {
+      final cached = await _cacheService.getSessionDetail(id);
+      if (cached != null) return cached;
       rethrow;
     }
   }

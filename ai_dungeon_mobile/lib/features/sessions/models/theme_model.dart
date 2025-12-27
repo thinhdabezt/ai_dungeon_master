@@ -22,4 +22,17 @@ class ThemeModel {
       imageUrl: json['imageUrl'] as String? ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'key': key,
+    'name': name,
+    'description': description,
+    'imageUrl': imageUrl,
+  };
+
+  // Helper for UI (requires importing material in consuming files or treating as dynamic/int if we want to keep model pure)
+  // To keep model pure, we should probably have a utility class. 
+  // But let's add a simple string helper or just keep the logic in UI.
+  // actually, let's keep logic in UI or a separate `ThemeUtils`.
 }
