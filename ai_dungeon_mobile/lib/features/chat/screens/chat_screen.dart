@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input.dart';
+import '../../learning/widgets/extraction_bottom_sheet.dart';
 
 class ChatScreen extends StatefulWidget {
   final String sessionId;
@@ -97,7 +98,20 @@ class _ChatScreenState extends State<ChatScreen> {
                                ),
                              );
                           }
-                          return ChatBubble(message: chatProvider.messages[index]);
+                          return ChatBubble(
+                            message: chatProvider.messages[index],
+                            onInspect: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (ctx) => ExtractionBottomSheet(
+                                  text: chatProvider.messages[index].content,
+                                  sessionId: widget.sessionId,
+                                ),
+                              );
+                            },
+                          );
                         },
                       ),
           ),

@@ -90,10 +90,11 @@ public class SessionsController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-            return StatusCode(503, ex.Message); // Service Unavailable for AI errors
+        catch (HttpRequestException ex)
+        {
+            return StatusCode(503, ex.Message);
         }
     }
-
     [HttpPatch("{id}/title")]
     public async Task<IActionResult> RenameSession(Guid id, [FromBody] RenameSessionDto dto)
     {

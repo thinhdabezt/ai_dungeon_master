@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AIDungeonBackend.DTOs;
 using AIDungeonBackend.Models;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http;
@@ -24,22 +25,8 @@ public class GeminiService : IGeminiService
         var model = _configuration["Gemini:Model"] ?? "gemini-1.5-flash";
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
 
-        // Build prompt structure
-        // Gemini API expects "contents" array with "role" (user/model) and "parts"
-        
         var contents = new List<object>();
 
-        // System prompt isn't strictly "system" role in all Gemini versions, 
-        // but typically handled as initial context or specialized system instruction if supported.
-        // For simple flash/pro chat-v1, we can prepend it or use "system" role if the model supports it (1.5-flash does).
-        
-        // Let's use the explicit "systemInstruction" property if utilizing v1beta API properly, 
-        // OR just prepend to the prompt context. To be safe and simple with REST:
-        // We will pass system instruction as a separate parameter if the API supports it, 
-        // but standard practice for REST: simple contents array.
-        
-        // HOWEVER, v1beta models/gemini-1.5-flash supports "systemInstruction" field at the top level.
-        
         foreach (var msg in history)
         {
             var role = msg.Role == "player" ? "user" : "model";
@@ -50,7 +37,6 @@ public class GeminiService : IGeminiService
             });
         }
 
-        // Add the new user input
         contents.Add(new
         {
             role = "user",
@@ -66,7 +52,7 @@ public class GeminiService : IGeminiService
             contents = contents,
             generationConfig = new
             {
-                temperature = 0.7, // could be parameterized from Theme
+                temperature = 0.7,
                 maxOutputTokens = 1024
             }
         };
@@ -109,6 +95,77 @@ public class GeminiService : IGeminiService
         catch (Exception ex)
         {
              throw new Exception("Failed to parse Gemini response", ex);
+        }
+    }
+
+    public async Task<List<VocabularyExtractionDto>> ExtractVocabularyAsync(string text)
+    {
+        var apiKey = _configuration["Gemini:ApiKey"];
+        var model = "gemini-1.5-flash"; 
+        var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
+        
+        var prompt = @"Analyze the following text. Identify 3 to 5 advanced or useful English vocabulary words or idioms (CEFR B2-C2 level) present in the text. 
+Return strictly a JSON array of objects. Do not include markdown formatting like ```json or ```. Just the raw JSON array.
+Format: 
+[
+  { ""word"": ""Word"", ""definition"": ""Brief definition"", ""partOfSpeech"": ""Part of speech"", ""context"": ""Original context from text"" }
+]
+
+Text to analyze:
+" + text;
+
+        var requestBody = new
+        {
+            contents = new[]
+            {
+                new { role = "user", parts = new[] { new { text = prompt } } }
+            },
+            generationConfig = new
+            {
+                temperature = 0.3,
+                maxOutputTokens = 1024
+            }
+        };
+
+        var jsonBody = JsonSerializer.Serialize(requestBody);
+        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+        var client = _httpClientFactory.CreateClient("GeminiClient");
+        var response = await client.PostAsync(url, content);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Gemini API Error: {response.StatusCode} - {errorBody}");
+        }
+
+        var responseString = await response.Content.ReadAsStringAsync();
+        using var document = JsonDocument.Parse(responseString);
+        
+        try 
+        {
+            var rawText = document.RootElement
+                .GetProperty("candidates")[0]
+                .GetProperty("content")
+                .GetProperty("parts")[0]
+                .GetProperty("text")
+                .GetString() ?? "[]";
+
+            // Cleanup markdown
+            rawText = rawText.Trim();
+            if (rawText.StartsWith("```json")) rawText = rawText.Substring(7);
+            if (rawText.StartsWith("```")) rawText = rawText.Substring(3);
+            if (rawText.EndsWith("```")) rawText = rawText.Substring(0, rawText.Length - 3);
+            rawText = rawText.Trim();
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var result = JsonSerializer.Deserialize<List<VocabularyExtractionDto>>(rawText, options);
+            return result ?? new List<VocabularyExtractionDto>();
+        }
+        catch (Exception ex)
+        {
+             Console.WriteLine($"Failed to parse vocabulary: {ex.Message}");
+             return new List<VocabularyExtractionDto>();
         }
     }
 }

@@ -172,8 +172,30 @@ Mỗi milestone front-end tương ứng với backend features.
 **Tasks:** caching session list + messages for offline reading.
 
 ### Milestone F6 — Learning features (phase 1)
-**Mục tiêu:** Vocabulary extraction & flashcards basics.  
-**Endpoints:** backend exposes `POST /api/learning/extract` and `GET /api/learning/cards` and Flutter displays cards + schedule reviews.
+**Mục tiêu:** Vocabulary extraction & flashcards basics (The Grimoire).
+**Backend (New `LearningController`):**
+*   [x] `POST /api/learning/extract`: Analyze text via Gemini to identify B2+ vocabulary (JSON output).
+*   [x] `GET /api/learning/cards`: List saved flashcards.
+*   [x] `POST /api/learning/cards`: Save a new flashcard (Word, Definition, Context, Source).
+**Frontend:**
+*   [x] **Chat UI**: Add "Inspect Knowledge" (Magic Wand / Book) button to AI messages to trigger extraction.
+*   [x] **Extraction UI**: Bottom sheet displaying extracted words with "Save" capability.
+*   [x] **Grimoire Screen**: List view of saved vocab cards.
+
+### Milestone F7 — Learning Phase 2: Spaced Repetition (SRS)
+**Goal:** Efficient review system.
+**Backend:** Logic to calculate `NextReviewDate` based on user ratings (Again, Hard, Good, Easy).
+**Frontend:** SRS Review UI (Flashcards with rating buttons) & Daily Review Schedule notification.
+
+### Milestone F8 — Learning Phase 3: Gamification
+**Goal:** Reward learning.
+**Backend:** Track `LearningXP`, award badges/achievements.
+**Frontend:** Profile screen stats ("Words Mastery", "Streak"), level up animations.
+
+### Milestone F9 — Learning Phase 4: Active Usage
+**Goal:** Make the story adapt to the user's learning list.
+**Backend:** Inject "Target Vocabulary" into System Prompt: *"Try to weave the following words into the narrative: [ephemeral, serendipity...]"*.
+**Frontend:** Highlight target words in Chat UI.
 
 ---
 

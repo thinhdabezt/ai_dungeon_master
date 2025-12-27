@@ -49,6 +49,13 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.menu_book, color: Colors.amber),
+            tooltip: 'The Grimoire',
+            onPressed: () {
+              context.push('/grimoire');
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
               context.read<AuthProvider>().logout();

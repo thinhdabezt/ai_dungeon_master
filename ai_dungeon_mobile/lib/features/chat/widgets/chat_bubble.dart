@@ -5,8 +5,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 class ChatBubble extends StatelessWidget {
   final MessageModel message;
+  final VoidCallback? onInspect;
 
-  const ChatBubble({super.key, required this.message});
+  const ChatBubble({super.key, required this.message, this.onInspect});
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +86,35 @@ class ChatBubble extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+              ],
+            
+            // Knowledge Inspection Button
+            if (!isUser) ...[
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: InkWell(
+                  onTap: onInspect,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.auto_awesome, size: 14, color: isUser ? Colors.white70 : theme.primaryColor.withAlpha(200)),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Inspect',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                              color: isUser ? Colors.white70 : theme.primaryColor.withAlpha(200),
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -14,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Theme> Themes { get; set; }
     public DbSet<StorySession> StorySessions { get; set; }
     public DbSet<SessionMessage> SessionMessages { get; set; }
+    public DbSet<Flashcard> Flashcards { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

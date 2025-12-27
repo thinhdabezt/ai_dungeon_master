@@ -16,6 +16,9 @@ import 'features/sessions/screens/new_session_screen.dart';
 import 'features/chat/providers/chat_provider.dart';
 import 'features/chat/screens/chat_screen.dart';
 import 'core/storage/cache_service.dart';
+import 'features/learning/services/learning_service.dart';
+import 'features/learning/providers/learning_provider.dart';
+import 'features/learning/screens/grimoire_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +47,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => ChatProvider(sessionService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LearningProvider(LearningService(apiClient)),
         ),
       ],
       child: const AppRouter(),
@@ -86,6 +92,10 @@ class AppRouter extends StatelessWidget {
             final title = state.extra as String?;
             return ChatScreen(sessionId: id, title: title);
           },
+        ),
+        GoRoute(
+          path: '/grimoire',
+          builder: (context, state) => const GrimoireScreen(),
         ),
       ],
     );
