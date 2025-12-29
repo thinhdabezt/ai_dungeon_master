@@ -66,6 +66,10 @@ public class SessionService : ISessionService
 
         // 5. Construct System Prompt (with Hint instruction if needed)
         var systemPrompt = session.Theme.PersonaPrompt;
+        
+        // [FORMAT ENFORCEMENT]
+        systemPrompt += "\n\n[FORMAT]: Always end the response by putting the player in a situation where they have to take an action and include a Socratic question for the player.";
+
         if (includeHint)
         {
             systemPrompt += "\n\n[INSTRUCTION]: You must also provide a short, helpful hint for the player's next move. " +
@@ -132,8 +136,8 @@ public class SessionService : ISessionService
         // --- Auto-Start Conversation ---
         try 
         {
-            // Hidden prompt to kickstart the AI
-            var startPrompt = "Begin the adventure. Provide a vivid, engaging introduction to the setting and the current situation, ending with a hook for the player. Keep it under 150 words.";
+            // Hidden prompt to kickstart the AI with strict formatting
+            var startPrompt = "Begin the adventure. Provide a vivid, engaging introduction to the setting and the current situation. You MUST end the response by putting the player in a situation where they have to take an action and include a Socratic question for the player. Keep it under 150 words.";
             var systemPrompt = theme.PersonaPrompt;
             var (introContent, inTokens, outTokens) = await _geminiService.GenerateContentAsync(systemPrompt, new List<SessionMessage>(), startPrompt);
             

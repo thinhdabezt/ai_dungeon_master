@@ -11,6 +11,7 @@ class AppTheme {
       surface: const Color(0xFF121212),
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),
+    cardColor: const Color(0xFF252525), // Lighter than background for contrast
     textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,

@@ -50,4 +50,11 @@ class LearningService {
       rethrow;
     }
   }
+  Future<void> deleteCard(String id) async {
+    try {
+      await _apiClient.dio.delete('/learning/cards/$id');
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

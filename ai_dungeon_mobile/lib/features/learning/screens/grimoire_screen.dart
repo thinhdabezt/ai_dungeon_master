@@ -34,37 +34,53 @@ class _GrimoireScreenState extends State<GrimoireScreen> {
                   itemCount: provider.cards.length,
                   itemBuilder: (context, index) {
                     final card = provider.cards[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: ExpansionTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Theme.of(context).primaryColor.withAlpha(50),
-                          child: Text(
-                             (card.word.isNotEmpty) ? card.word[0].toUpperCase() : '?',
-                             style: TextStyle(color: Theme.of(context).primaryColor)
-                          ),
-                        ),
-                        title: Text(card.word, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(card.definition, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text('Definition', style: Theme.of(context).textTheme.labelSmall),
-                                const SizedBox(height: 4),
-                                Text(card.definition),
-                                const SizedBox(height: 12),
-                                if (card.contextSentence != null) ...[
-                                   Text('In Context', style: Theme.of(context).textTheme.labelSmall),
-                                   const SizedBox(height: 4),
-                                   Text('"${card.contextSentence}"', style: const TextStyle(fontStyle: FontStyle.italic)),
-                                ]
-                              ],
+                    return Dismissible(
+                      key: Key(card.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        color: Colors.red,
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      onDismissed: (direction) {
+                        context.read<LearningProvider>().deleteCard(card.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${card.word} removed from Grimoire')),
+                        );
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ExpansionTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Theme.of(context).primaryColor.withAlpha(50),
+                            child: Text(
+                               (card.word.isNotEmpty) ? card.word[0].toUpperCase() : '?',
+                               style: TextStyle(color: Theme.of(context).primaryColor)
                             ),
-                          )
-                        ],
+                          ),
+                          title: Text(card.word, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text(card.definition, maxLines: 1, overflow: TextOverflow.ellipsis),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text('Definition', style: Theme.of(context).textTheme.labelSmall),
+                                  const SizedBox(height: 4),
+                                  Text(card.definition),
+                                  const SizedBox(height: 12),
+                                  if (card.contextSentence != null) ...[
+                                     Text('In Context', style: Theme.of(context).textTheme.labelSmall),
+                                     const SizedBox(height: 4),
+                                     Text('"${card.contextSentence}"', style: const TextStyle(fontStyle: FontStyle.italic)),
+                                  ]
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ).animate().fadeIn(delay: (50 * index).ms).slideX();
                   },

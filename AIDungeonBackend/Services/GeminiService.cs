@@ -22,7 +22,7 @@ public class GeminiService : IGeminiService
     public async Task<(string Content, int InputTokens, int OutputTokens)> GenerateContentAsync(string systemPrompt, List<SessionMessage> history, string newUserInput)
     {
         var apiKey = _configuration["Gemini:ApiKey"];
-        var model = _configuration["Gemini:Model"] ?? "gemini-1.5-flash";
+        var model = _configuration["Gemini:Model"] ?? "gemini-2.0-flash-lite";
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
 
         var contents = new List<object>();
@@ -101,7 +101,7 @@ public class GeminiService : IGeminiService
     public async Task<List<VocabularyExtractionDto>> ExtractVocabularyAsync(string text)
     {
         var apiKey = _configuration["Gemini:ApiKey"];
-        var model = "gemini-1.5-flash"; 
+        var model = _configuration["Gemini:Model"] ?? "gemini-2.0-flash-lite";
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
         
         var prompt = @"Analyze the following text. Identify 3 to 5 advanced or useful English vocabulary words or idioms (CEFR B2-C2 level) present in the text. 
@@ -144,17 +144,27 @@ Text to analyze:
         
         try 
         {
-            var rawText = document.RootElement
-                .GetProperty("candidates")[0]
-                .GetProperty("content")
-                .GetProperty("parts")[0]
-                .GetProperty("text")
-                .GetString() ?? "[]";
+            if (!document.RootElement.TryGetProperty("candidates", out var candidates) || candidates.GetArrayLength() == 0)
+            {
+                // No candidates (blocked?)
+                Console.WriteLine("Gemini: No candidates returned (Safety block?)");
+                return new List<VocabularyExtractionDto>();
+            }
+
+            var firstCand = candidates[0];
+            if (!firstCand.TryGetProperty("content", out var contentDoc))
+            {
+                 Console.WriteLine("Gemini: Candidate has no content (Safety block?)");
+                 return new List<VocabularyExtractionDto>();
+            }
+
+            var rawText = contentDoc.GetProperty("parts")[0].GetProperty("text").GetString() ?? "[]";
 
             // Cleanup markdown
             rawText = rawText.Trim();
             if (rawText.StartsWith("```json")) rawText = rawText.Substring(7);
-            if (rawText.StartsWith("```")) rawText = rawText.Substring(3);
+            else if (rawText.StartsWith("```")) rawText = rawText.Substring(3); // Handle generic code block
+            
             if (rawText.EndsWith("```")) rawText = rawText.Substring(0, rawText.Length - 3);
             rawText = rawText.Trim();
 

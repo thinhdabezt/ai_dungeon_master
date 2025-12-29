@@ -44,4 +44,15 @@ class LearningProvider extends ChangeNotifier {
       throw e;
     }
   }
+  Future<void> deleteCard(String id) async {
+    try {
+      await _service.deleteCard(id);
+      _cards.removeWhere((c) => c.id == id);
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to delete card: $e';
+      notifyListeners();
+      throw e;
+    }
+  }
 }

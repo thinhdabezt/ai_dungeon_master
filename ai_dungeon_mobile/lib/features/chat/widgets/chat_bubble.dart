@@ -27,16 +27,17 @@ class ChatBubble extends StatelessWidget {
               ? theme.primaryColor 
               : theme.cardColor,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(12),
-            topRight: const Radius.circular(12),
-            bottomLeft: isUser ? const Radius.circular(12) : Radius.zero,
-            bottomRight: isUser ? Radius.zero : const Radius.circular(12),
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: isUser ? const Radius.circular(16) : Radius.zero,
+            bottomRight: isUser ? Radius.zero : const Radius.circular(16),
           ),
+          border: isUser ? null : Border.all(color: Colors.white.withOpacity(0.1)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(50),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              color: Colors.black.withAlpha(80),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -93,29 +94,18 @@ class ChatBubble extends StatelessWidget {
             
             // Knowledge Inspection Button
             if (!isUser) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
-                child: InkWell(
-                  onTap: onInspect,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.auto_awesome, size: 14, color: isUser ? Colors.white70 : theme.primaryColor.withAlpha(200)),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Inspect',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                              color: isUser ? Colors.white70 : theme.primaryColor.withAlpha(200),
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ],
-                    ),
+                child: TextButton.icon(
+                  onPressed: onInspect,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white, // Changed to white as requested
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    backgroundColor: Colors.white.withOpacity(0.1), // Subtle white background
                   ),
+                  icon: const Icon(Icons.auto_awesome, size: 16),
+                  label: const Text('Inspect World'),
                 ),
               ),
             ],

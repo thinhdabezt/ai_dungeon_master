@@ -17,7 +17,10 @@ public record SessionMessageDto(
     Guid Id,
     string Role,
     string Content,
-    DateTime CreatedAt
+
+    DateTime CreatedAt,
+    string? Hint,
+    int TokenCount
 );
 
 public record RenameSessionDto(string NewTitle);
