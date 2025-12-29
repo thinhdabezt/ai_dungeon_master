@@ -18,7 +18,8 @@ class ThemeModel {
       id: json['id'] as int,
       key: json['key'] as String,
       name: json['name'] as String,
-      description: json['description'] as String,
+      // Backend returns personaPrompt, we map it to description for now
+      description: (json['description'] ?? json['personaPrompt'] ?? 'No description') as String,
       imageUrl: json['imageUrl'] as String? ?? '',
     );
   }

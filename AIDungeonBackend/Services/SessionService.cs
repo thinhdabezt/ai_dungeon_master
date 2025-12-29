@@ -123,11 +123,29 @@ public class SessionService : ISessionService
             UserId = userId,
             ThemeId = theme.Id,
             Title = title,
+            Theme = theme // Explicitly set loaded theme
         };
 
         _context.StorySessions.Add(session);
         await _context.SaveChangesAsync();
         
+        // --- Auto-Start Conversation ---
+        try 
+        {
+            // Hidden prompt to kickstart the AI
+            var startPrompt = "Begin the adventure. Provide a vivid, engaging introduction to the setting and the current situation, ending with a hook for the player. Keep it under 150 words.";
+            var systemPrompt = theme.PersonaPrompt;
+            var (introContent, inTokens, outTokens) = await _geminiService.GenerateContentAsync(systemPrompt, new List<SessionMessage>(), startPrompt);
+            
+            // Save intro message
+            await AddDmMessageAsync(session.Id, introContent, null, inTokens + outTokens);
+        }
+        catch (Exception ex)
+        {
+            // Fallback if AI fails (e.g. quota, network) so session is still usable
+            await AddDmMessageAsync(session.Id, "The mists clear, but the world is silent. (AI failed to generate intro: " + ex.Message + ")");
+        }
+
         return session;
     }
 

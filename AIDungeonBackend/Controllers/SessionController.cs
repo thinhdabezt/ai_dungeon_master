@@ -5,6 +5,10 @@ using System.Security.Claims;
 
 namespace AIDungeonBackend.Controllers;
 
+using AIDungeonBackend.DTOs;
+using AIDungeonBackend.Models;
+
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -24,13 +28,27 @@ public class SessionsController : ControllerBase
         throw new UnauthorizedAccessException("User ID not found in token");
     }
 
+    private static StorySessionDto ToDto(StorySession s)
+    {
+        return new StorySessionDto(
+            s.Id,
+            s.UserId,
+            s.Title,
+            s.Theme?.Key ?? "classic_high_fantasy", // Fallback or strict?
+            s.Theme?.Name ?? "Unknown Theme",
+            s.CreatedAt,
+            s.LastUpdated,
+            s.Messages.Select(m => new SessionMessageDto(m.Id, m.Role, m.Content, m.CreatedAt)).ToList()
+        );
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateSession([FromBody] CreateSessionDto dto)
     {
         try 
         {
             var session = await _sessionService.CreateSessionAsync(GetUserId(), dto.Title, dto.ThemeKey);
-            return Ok(session);
+            return Ok(ToDto(session));
         }
         catch (ArgumentException ex)
         {
@@ -42,7 +60,7 @@ public class SessionsController : ControllerBase
     public async Task<IActionResult> GetSessions([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var sessions = await _sessionService.GetSessionsAsync(GetUserId(), page, pageSize);
-        return Ok(sessions);
+        return Ok(sessions.Select(ToDto));
     }
 
     [HttpGet("{id}")]
@@ -50,7 +68,7 @@ public class SessionsController : ControllerBase
     {
         var session = await _sessionService.GetSessionAsync(id, GetUserId());
         if (session == null) return NotFound();
-        return Ok(session);
+        return Ok(ToDto(session));
     }
 
     [HttpPost("{id}/messages")]
@@ -109,9 +127,3 @@ public class SessionsController : ControllerBase
         }
     }
 }
-
-public record RenameSessionDto(string NewTitle);
-
-public record CreateSessionDto(string Title, string ThemeKey);
-public record MessageDto(string Content);
-public record ChatRequestDto(string Input, bool IncludeHint = false);

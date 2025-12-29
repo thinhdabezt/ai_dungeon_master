@@ -108,80 +108,77 @@ class _NewSessionScreenState extends State<NewSessionScreen> {
               else if (provider.themes.isEmpty)
                 const Text('No themes available.')
               else
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.8, // Taller cards
-                  ),
-                  itemCount: provider.themes.length,
-                  itemBuilder: (context, index) {
-                    final theme = provider.themes[index];
-                    final isSelected = _selectedTheme == theme;
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // Changed to 3
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 0.9, // Adjusted for 3x3
+                    ),
+                    itemCount: provider.themes.length,
+                    itemBuilder: (context, index) {
+                      final theme = provider.themes[index];
+                      final isSelected = _selectedTheme == theme;
 
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedTheme = theme;
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        decoration: BoxDecoration(
-                          color: isSelected 
-                              ? Theme.of(context).primaryColor.withAlpha(50) 
-                              : Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedTheme = theme;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            // Use distinct surface color (Grey) for cards
+                            // Blend with the explicit violet color (0xFF8B5CF6) when selected
                             color: isSelected 
-                              ? Theme.of(context).primaryColor 
-                              : Colors.transparent,
-                            width: 2,
+                                ? Color.alphaBlend(const Color(0xFF8B5CF6).withOpacity(0.25), const Color(0xFF1E1E1E))
+                                : const Color(0xFF1E1E1E), 
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected 
+                                ? const Color(0xFF8B5CF6) // Explicit Violet
+                                : Colors.white12, 
+                              width: isSelected ? 3 : 1, 
+                            ),
+                            boxShadow: isSelected
+                                ? [BoxShadow(color: const Color(0xFF8B5CF6).withOpacity(0.4), blurRadius: 8, spreadRadius: 1)]
+                                : [], 
                           ),
-                          boxShadow: isSelected
-                              ? [BoxShadow(color: Theme.of(context).primaryColor.withAlpha(100), blurRadius: 8)]
-                              : [],
-                        ),
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Placeholder Icon/Image based on theme name logic or generic
-                            Icon(
-                              ThemeUtils.getThemeIcon(theme.key),
-                              size: 32,
-                              color: isSelected ? Theme.of(context).primaryColor : Colors.white70,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              theme.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isSelected ? Theme.of(context).primaryColor : Colors.white,
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                ThemeUtils.getThemeIcon(theme.key),
+                                size: 32,
+                                color: isSelected ? const Color(0xFF8B5CF6) : Colors.white70, // Explicit Violet
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: Text(
-                                theme.description,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontSize: 10,
-                                  color: Colors.white54,
+                              const SizedBox(height: 8),
+                              Expanded( 
+                                child: Center(
+                                  child: Text(
+                                    theme.name,
+                                    style: TextStyle(
+                                      fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
+                                      fontSize: 12, 
+                                      color: isSelected ? const Color(0xFF8B5CF6) : Colors.white, // Explicit Violet
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.fade,
                               ),
-                            ),
-                          ],
+                              // Removed theme.description (AI prompt)
+                            ],
+                          ),
                         ),
-                      ),
-                    ).animate().scale(delay: (50*index).ms);
-                  },
-                ),
+                      ).animate().scale(delay: (50*index).ms);
+                    },
+                  ),
                 
               const SizedBox(height: 32),
               
