@@ -49,7 +49,7 @@ public class SessionsController : ControllerBase
     {
         try 
         {
-            var session = await _sessionService.CreateSessionAsync(GetUserId(), dto.Title, dto.ThemeKey);
+            var session = await _sessionService.CreateSessionAsync(GetUserId(), dto.Title, dto.ThemeKey, dto.IeltsBand);
             return Ok(ToDto(session));
         }
         catch (ArgumentException ex)

@@ -27,6 +27,6 @@ public record SessionMessageDto(
 );
 
 public record RenameSessionDto(string NewTitle);
-public record CreateSessionDto(string Title, string ThemeKey);
+public record CreateSessionDto(string Title, string ThemeKey, string IeltsBand = "9.0");
 public record MessageDto(string Content);
 public record ChatRequestDto(string Input, bool IncludeHint = false);

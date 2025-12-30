@@ -47,10 +47,10 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-  Future<SessionModel?> createSession(String title, String themeKey) async {
+  Future<SessionModel?> createSession(String title, String themeKey, {String ieltsBand = "9.0"}) async {
     _setLoading(true);
     try {
-      final dto = CreateSessionDto(title: title, themeKey: themeKey);
+      final dto = CreateSessionDto(title: title, themeKey: themeKey, ieltsBand: ieltsBand);
       final newSession = await _sessionService.createSession(dto);
       _sessions.insert(0, newSession);
       _errorMessage = null;

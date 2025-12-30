@@ -66,6 +66,9 @@ public class SessionService : ISessionService
 
         // 5. Construct System Prompt (with Hint instruction if needed)
         var systemPrompt = session.Theme.PersonaPrompt;
+
+        // [IELTS ADJUSTMENT]
+        systemPrompt += $"\n\n[INSTRUCTION]: Adjust your vocabulary and sentence structure to match IELTS Band {session.IeltsBand} proficiency. Ensure the complexity of the text aligns with this level.";
         
         // [FORMAT ENFORCEMENT]
         systemPrompt += "\n\n[FORMAT]: Always end the response by putting the player in a situation where they have to take an action and include a Socratic question for the player.";
@@ -114,7 +117,7 @@ public class SessionService : ISessionService
     }
 
     // ... existing CreateSessionAsync ...
-    public async Task<StorySession> CreateSessionAsync(Guid userId, string title, string themeKey)
+    public async Task<StorySession> CreateSessionAsync(Guid userId, string title, string themeKey, string ieltsBand)
     {
         var theme = await _context.Themes.FirstOrDefaultAsync(t => t.Key == themeKey);
         if (theme == null)
@@ -127,7 +130,8 @@ public class SessionService : ISessionService
             UserId = userId,
             ThemeId = theme.Id,
             Title = title,
-            Theme = theme // Explicitly set loaded theme
+            Theme = theme, // Explicitly set loaded theme
+            IeltsBand = ieltsBand
         };
 
         _context.StorySessions.Add(session);
@@ -137,7 +141,7 @@ public class SessionService : ISessionService
         try 
         {
             // Hidden prompt to kickstart the AI with strict formatting
-            var startPrompt = "Begin the adventure. Provide a vivid, engaging introduction to the setting and the current situation. You MUST end the response by putting the player in a situation where they have to take an action and include a Socratic question for the player. Keep it under 150 words.";
+            var startPrompt = $"[IELTS LEVEL: {ieltsBand}] Begin the adventure. Provide a vivid, engaging introduction to the setting and the current situation. You MUST end the response by putting the player in a situation where they have to take an action and include a Socratic question for the player. Keep it under 150 words. Use vocabulary matching IELTS Band {ieltsBand}.";
             var systemPrompt = theme.PersonaPrompt;
             var (introContent, inTokens, outTokens) = await _geminiService.GenerateContentAsync(systemPrompt, new List<SessionMessage>(), startPrompt);
             

@@ -16,7 +16,10 @@ class NewSessionScreen extends StatefulWidget {
 class _NewSessionScreenState extends State<NewSessionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+
   ThemeModel? _selectedTheme; // Use ThemeModel for type safety
+  String _ieltsBand = "9.0";
+  final List<String> _ieltsBands = ["5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0"];
 
   @override
   void initState() {
@@ -37,6 +40,7 @@ class _NewSessionScreenState extends State<NewSessionScreen> {
       final newSession = await context.read<SessionProvider>().createSession(
             _titleController.text.trim(),
             _selectedTheme!.key,
+            ieltsBand: _ieltsBand,
           );
       
       if (newSession != null && mounted) {
@@ -89,6 +93,28 @@ class _NewSessionScreenState extends State<NewSessionScreen> {
                     return 'Please enter a title';
                   }
                   return null;
+                },
+              ),
+
+              const SizedBox(height: 24),
+
+              // IELTS BAND SELECTOR
+              DropdownButtonFormField<String>(
+                value: _ieltsBand,
+                decoration: const InputDecoration(
+                  labelText: 'IELTS Band (Vocabulary Level)',
+                  prefixIcon: Icon(Icons.school),
+                ),
+                items: _ieltsBands.map((band) => DropdownMenuItem(
+                  value: band, 
+                  child: Text(band)
+                )).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _ieltsBand = value;
+                    });
+                  }
                 },
               ),
               const SizedBox(height: 32),

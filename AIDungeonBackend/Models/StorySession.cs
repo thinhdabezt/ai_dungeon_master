@@ -17,6 +17,9 @@ public class StorySession
     public string Title { get; set; } = string.Empty;
 
     public bool IsPinned { get; set; }
+    
+    [MaxLength(10)]
+    public string IeltsBand { get; set; } = "9.0"; // Default to high proficiency
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
