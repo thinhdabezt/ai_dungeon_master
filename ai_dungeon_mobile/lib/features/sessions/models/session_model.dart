@@ -7,7 +7,10 @@ class SessionModel {
   final String themeKey;
   final DateTime createdAt;
   final DateTime lastUpdated;
+
   final List<MessageModel> messages;
+  final int dailyTokensUsed;
+  final int maxTokens;
 
   SessionModel({
     required this.id,
@@ -17,6 +20,8 @@ class SessionModel {
     required this.createdAt,
     required this.lastUpdated,
     this.messages = const [],
+    this.dailyTokensUsed = 0,
+    this.maxTokens = 50000,
   });
 
   factory SessionModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +36,9 @@ class SessionModel {
               ?.map((e) => MessageModel.fromJson(e))
               .toList() ??
           [],
+
+      dailyTokensUsed: json['dailyTokensUsed'] ?? 0,
+      maxTokens: json['maxTokens'] ?? 50000,
     );
   }
 
@@ -42,6 +50,8 @@ class SessionModel {
     'createdAt': createdAt.toIso8601String(),
     'lastUpdated': lastUpdated.toIso8601String(),
     'messages': messages.map((e) => e.toJson()).toList(),
+    'dailyTokensUsed': dailyTokensUsed,
+    'maxTokens': maxTokens,
   };
 }
 

@@ -64,15 +64,25 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await sessionProvider.loadSessions();
-        },
-        child: sessionProvider.isLoading && sessionProvider.sessions.isEmpty
-            ? const Center(child: CircularProgressIndicator())
-            : sessionProvider.sessions.isEmpty
-                ? _buildEmptyState(context)
-                : _buildSessionList(context, sessionProvider),
+      body: Column(
+        children: [
+          // Daily Quota Bar
+          if (sessionProvider.sessions.isNotEmpty)
+            _buildDailyQuota(context, sessionProvider.sessions.first),
+            
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await sessionProvider.loadSessions();
+              },
+              child: sessionProvider.isLoading && sessionProvider.sessions.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : sessionProvider.sessions.isEmpty
+                      ? _buildEmptyState(context)
+                      : _buildSessionList(context, sessionProvider),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -152,10 +162,10 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               leading: CircleAvatar(
-                backgroundColor: ThemeUtils.getThemeColor(session.themeKey, context).withAlpha(50),
+                backgroundColor: ThemeUtils.getThemeColor(session.themeKey, context), // Solid color
                 child: Icon(
                   ThemeUtils.getThemeIcon(session.themeKey),
-                  color: ThemeUtils.getThemeColor(session.themeKey, context),
+                  color: Colors.white, // White icon for better contrast
                   size: 20,
                 ),
               ),
@@ -236,6 +246,44 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
     );
   }
 
+
+  Widget _buildDailyQuota(BuildContext context, dynamic session) {
+    // SessionModel session
+    final double progress = (session.dailyTokensUsed / session.maxTokens).clamp(0.0, 1.0);
+    final bool isNearLimit = progress > 0.9;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      color: Theme.of(context).cardColor,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Daily Power (Tokens)', style: Theme.of(context).textTheme.labelSmall),
+              Text(
+                '${(session.dailyTokensUsed / 1000).toStringAsFixed(1)}k / ${(session.maxTokens / 1000).toStringAsFixed(0)}k',
+                 style: TextStyle(
+                   color: isNearLimit ? Colors.red : Theme.of(context).textTheme.bodySmall?.color,
+                   fontWeight: FontWeight.bold
+                 )
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Theme.of(context).dividerColor.withAlpha(50),
+              color: isNearLimit ? Colors.red : Theme.of(context).primaryColor,
+              minHeight: 8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showRenameDialog(BuildContext context, dynamic session, SessionProvider provider) {
     final controller = TextEditingController(text: session.title);

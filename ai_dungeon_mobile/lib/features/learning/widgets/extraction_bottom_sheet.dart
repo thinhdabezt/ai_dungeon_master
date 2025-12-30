@@ -80,8 +80,8 @@ class _ExtractionBottomSheetState extends State<ExtractionBottomSheet> {
                         ],
                       ),
                       trailing: IconButton(
-                        icon: Icon(isSaved ? Icons.check_circle : Icons.add_circle_outline, 
-                                   color: isSaved ? Colors.green : Theme.of(context).primaryColor),
+                        icon: Icon(isSaved ? Icons.check_circle : Icons.add_circle, // Filled icon for better visibility
+                                   color: isSaved ? Colors.green : Colors.white), // White for contrast on dark card
                         onPressed: isSaved ? null : () async {
                            try {
                              await context.read<LearningProvider>().saveCard(

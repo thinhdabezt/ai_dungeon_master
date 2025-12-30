@@ -10,7 +10,10 @@ public record StorySessionDto(
     string ThemeName,
     DateTime CreatedAt,
     DateTime LastUpdated,
-    List<SessionMessageDto> Messages
+
+    List<SessionMessageDto> Messages,
+    int DailyTokensUsed,
+    int MaxTokens
 );
 
 public record SessionMessageDto(

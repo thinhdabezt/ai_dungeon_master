@@ -161,6 +161,8 @@ public class SessionService : ISessionService
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Include(s => s.Theme)
+            .Include(s => s.Messages)
+            .Include(s => s.User) // Include User for Daily Token Usage
             .ToListAsync();
     }
 

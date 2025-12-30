@@ -38,7 +38,9 @@ public class SessionsController : ControllerBase
             s.Theme?.Name ?? "Unknown Theme",
             s.CreatedAt,
             s.LastUpdated,
-            s.Messages.Select(m => new SessionMessageDto(m.Id, m.Role, m.Content, m.CreatedAt, m.Hint, m.TokenCount ?? 0)).ToList()
+            s.Messages.Select(m => new SessionMessageDto(m.Id, m.Role, m.Content, m.CreatedAt, m.Hint, m.TokenCount ?? 0)).ToList(), // Messages
+            s.User?.DailyTokenUsage ?? 0,
+            10000 // User Daily Token Limit
         );
     }
 

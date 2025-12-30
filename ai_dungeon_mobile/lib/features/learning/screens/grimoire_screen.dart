@@ -53,10 +53,10 @@ class _GrimoireScreenState extends State<GrimoireScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         child: ExpansionTile(
                           leading: CircleAvatar(
-                            backgroundColor: Theme.of(context).primaryColor.withAlpha(50),
+                            backgroundColor: Theme.of(context).primaryColor, // solid primary color
                             child: Text(
                                (card.word.isNotEmpty) ? card.word[0].toUpperCase() : '?',
-                               style: TextStyle(color: Theme.of(context).primaryColor)
+                               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold) // white text
                             ),
                           ),
                           title: Text(card.word, style: const TextStyle(fontWeight: FontWeight.bold)),
