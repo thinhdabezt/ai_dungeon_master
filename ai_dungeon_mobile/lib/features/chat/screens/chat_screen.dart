@@ -5,6 +5,7 @@ import '../providers/chat_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input.dart';
 import '../../learning/widgets/extraction_bottom_sheet.dart';
+import '../../learning/providers/learning_provider.dart';
 
 class ChatScreen extends StatefulWidget {
   final String sessionId;
@@ -28,6 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ChatProvider>().setCurrentSession(widget.sessionId);
+      context.read<LearningProvider>().loadCards();
     });
   }
 
@@ -98,8 +100,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                ),
                              );
                           }
+                          final learningProvider = context.watch<LearningProvider>();
+                          
                           return ChatBubble(
                             message: chatProvider.messages[index],
+                            highlightWords: learningProvider.cards.map((c) => c.word).toSet(),
                             onInspect: () {
                               showModalBottomSheet(
                                 context: context,

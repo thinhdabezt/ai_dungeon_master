@@ -70,6 +70,20 @@ public class SessionService : ISessionService
         // [IELTS ADJUSTMENT]
         systemPrompt += $"\n\n[INSTRUCTION]: Adjust your vocabulary and sentence structure to match IELTS Band {session.IeltsBand} proficiency. Ensure the complexity of the text aligns with this level.";
         
+        // [TARGET VOCABULARY INJECTION - Learning Phase 4]
+        var targetCards = await _context.Flashcards
+            .Where(f => f.UserId == userId)
+            // Ideally pick "Due" cards, but for now random or just take some
+            .OrderBy(r => Guid.NewGuid()) // SQLite random order might need specific function, doing client side random for simplicity if small dataset, or just take latest
+            .Take(5)
+            .ToListAsync();
+
+        if (targetCards.Any())
+        {
+            var wordList = string.Join(", ", targetCards.Select(c => c.Word));
+            systemPrompt += $"\n\n[TARGET VOCABULARY]: {wordList}. Try to weave these words naturally into the narrative if they fit the context. Do not force them.";
+        }
+
         // [FORMAT ENFORCEMENT]
         systemPrompt += "\n\n[FORMAT]: Always end the response by putting the player in a situation where they have to take an action and include a Socratic question for the player.";
 

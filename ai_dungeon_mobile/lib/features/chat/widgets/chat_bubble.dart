@@ -6,8 +6,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 class ChatBubble extends StatelessWidget {
   final MessageModel message;
   final VoidCallback? onInspect;
+  final Set<String>? highlightWords;
 
-  const ChatBubble({super.key, required this.message, this.onInspect});
+  const ChatBubble({
+    super.key, 
+    required this.message, 
+    this.onInspect,
+    this.highlightWords,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,15 +58,37 @@ class ChatBubble extends StatelessWidget {
                 ),
               )
             else
-              MarkdownBody(
-                data: message.content,
-                styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
-                  p: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white,
-                    height: 1.5,
-                  ),
+              else
+                Builder(
+                  builder: (context) {
+                    // Pre-process content to bold matching words
+                    String processedContent = message.content;
+                    if (highlightWords != null) {
+                      for (final word in highlightWords!) {
+                        // Case-insensitive replacement using Regex
+                        processedContent = processedContent.replaceAllMapped(
+                          RegExp(r'\b' + RegExp.escape(word) + r'\b', caseSensitive: false),
+                          (match) => '**${match.group(0)}**',
+                        );
+                      }
+                    }
+
+                    return MarkdownBody(
+                      data: processedContent,
+                      styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+                        p: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          height: 1.5,
+                        ),
+                        strong: TextStyle(
+                          color: Colors.amber, 
+                          fontWeight: FontWeight.bold,
+                          backgroundColor: Colors.amber.withOpacity(0.2)
+                        ),
+                      ),
+                    );
+                  }
                 ),
-              ),
             
             // Hint Display
             if (!isUser && message.hint != null && message.hint!.isNotEmpty) ...[
