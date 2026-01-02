@@ -25,13 +25,21 @@ public class SessionService : ISessionService
         if (user == null) throw new UnauthorizedAccessException("User not found.");
 
         const int DAILY_TOKEN_LIMIT = 50000;
+        const int RESET_HOUR = 6; // 6 AM UTC
+
+        // Calculate the start of the current "service day" logic
+        // If now is 4 AM, service day started yesterday at 6 AM.
+        // If now is 8 AM, service day started today at 6 AM.
+        var now = DateTime.UtcNow;
+        var currentServiceDayStart = now.Hour < RESET_HOUR 
+            ? now.Date.AddDays(-1).AddHours(RESET_HOUR) 
+            : now.Date.AddHours(RESET_HOUR);
         
-        // Reset quota if new day
-        if (DateTime.UtcNow.Date > user.LastTokenReset.Date)
+        // Reset quota if last reset was before the current service day start
+        if (user.LastTokenReset < currentServiceDayStart)
         {
             user.DailyTokenUsage = 0;
-            user.LastTokenReset = DateTime.UtcNow;
-            // Save happens later or now? Let's save now to be safe or just track objects
+            user.LastTokenReset = now;
             // EF Core tracking will handle it when we call SaveChangesAsync later.
         }
 
@@ -254,5 +262,18 @@ public class SessionService : ISessionService
         session.Title = newTitle;
         session.LastUpdated = DateTime.UtcNow;
         await _context.SaveChangesAsync();
+    }
+
+    public async Task ResetDailyQuotaAsync(Guid userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null)
+        {
+            user.DailyTokenUsage = 0;
+            // Optionally reset LastTokenReset to ensure it doesn't auto-reset again if logic was purely date based,
+            // but logic is "if (UtcNow > LastTokenReset)". If we reset now, usage is 0. 
+            // If tomorrow comes, it resets again. It's fine.
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -12,4 +12,5 @@ public interface ISessionService
     Task<SessionMessage> ProcessChatAsync(Guid sessionId, Guid userId, string playerInput, bool includeHint = false);
     Task DeleteSessionAsync(Guid sessionId, Guid userId);
     Task RenameSessionAsync(Guid sessionId, Guid userId, string newTitle);
+    Task ResetDailyQuotaAsync(Guid userId);
 }

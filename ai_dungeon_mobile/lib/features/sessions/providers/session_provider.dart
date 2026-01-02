@@ -111,6 +111,21 @@ class SessionProvider extends ChangeNotifier {
       _errorMessage = 'Failed to rename session: $e';
       notifyListeners();
     }
+      notifyListeners();
+    }
+  }
+
+  Future<void> resetDailyQuota() async {
+    _setLoading(true);
+    try {
+      await _sessionService.resetQuota();
+      await loadSessions(); // Reload to reflect 0 usage
+    } catch (e) {
+      _errorMessage = 'Failed to reset quota: $e';
+      notifyListeners();
+    } finally {
+      _setLoading(false);
+    }
   }
 
   void _setLoading(bool value) {

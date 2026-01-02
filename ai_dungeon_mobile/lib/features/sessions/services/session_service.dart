@@ -105,5 +105,12 @@ class SessionService {
       rethrow;
     }
   }
+  Future<void> resetQuota() async {
+    try {
+      await _apiClient.dio.post('/sessions/quota/reset');
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
 

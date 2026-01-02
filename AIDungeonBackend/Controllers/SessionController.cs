@@ -30,16 +30,33 @@ public class SessionsController : ControllerBase
 
     private static StorySessionDto ToDto(StorySession s)
     {
+        // Calculate effective daily token usage for display
+        // If the reset time (6 AM UTC) has passed but DB isn't updated, show 0.
+        int effectiveUsage = s.User?.DailyTokenUsage ?? 0;
+        if (s.User != null)
+        {
+            const int RESET_HOUR = 6;
+            var now = DateTime.UtcNow;
+            var currentServiceDayStart = now.Hour < RESET_HOUR 
+                ? now.Date.AddDays(-1).AddHours(RESET_HOUR) 
+                : now.Date.AddHours(RESET_HOUR);
+            
+            if (s.User.LastTokenReset < currentServiceDayStart)
+            {
+                effectiveUsage = 0;
+            }
+        }
+
         return new StorySessionDto(
             s.Id,
             s.UserId,
             s.Title,
-            s.Theme?.Key ?? "classic_high_fantasy", // Fallback or strict?
+            s.Theme?.Key ?? "classic_high_fantasy",
             s.Theme?.Name ?? "Unknown Theme",
             s.CreatedAt,
             s.LastUpdated,
             s.Messages.Select(m => new SessionMessageDto(m.Id, m.Role, m.Content, m.CreatedAt, m.Hint, m.TokenCount ?? 0)).ToList(), // Messages
-            s.User?.DailyTokenUsage ?? 0,
+            effectiveUsage,
             10000 // User Daily Token Limit
         );
     }
@@ -127,5 +144,12 @@ public class SessionsController : ControllerBase
         {
             return NotFound();
         }
+    }
+
+    [HttpPost("quota/reset")]
+    public async Task<IActionResult> ResetQuota()
+    {
+        await _sessionService.ResetDailyQuotaAsync(GetUserId());
+        return NoContent();
     }
 }

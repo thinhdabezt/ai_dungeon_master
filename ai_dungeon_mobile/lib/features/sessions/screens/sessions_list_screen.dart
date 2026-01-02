@@ -260,7 +260,34 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Daily Power (Tokens)', style: Theme.of(context).textTheme.labelSmall),
+              Row(
+                children: [
+                  Text('Daily Power (Tokens)', style: Theme.of(context).textTheme.labelSmall),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      // Simple confirmation
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Reset Quota?'),
+                          content: const Text('This will reset your daily usage to 0. Use only for testing.'),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Reset')),
+                          ],
+                        ),
+                      );
+
+                      if (confirm == true) {
+                         // ignore: use_build_context_synchronously
+                        await context.read<SessionProvider>().resetDailyQuota();
+                      }
+                    },
+                    child: Icon(Icons.refresh, size: 14, color: Theme.of(context).primaryColor),
+                  ),
+                ],
+              ),
               Text(
                 '${(session.dailyTokensUsed / 1000).toStringAsFixed(1)}k / ${(session.maxTokens / 1000).toStringAsFixed(0)}k',
                  style: TextStyle(
