@@ -24,4 +24,9 @@ public class User
     public DateTime LastTokenReset { get; set; } = DateTime.UtcNow;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Gamification (Phase 3)
+    public int LearningXP { get; set; } = 0;
+    public int CurrentStreak { get; set; } = 0;
+    public DateTime? LastStudyDate { get; set; }
 }

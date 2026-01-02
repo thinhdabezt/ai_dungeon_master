@@ -16,14 +16,24 @@ class User {
   final String id;
   final String username;
   final String email;
+  final int learningXP;
+  final int currentStreak;
 
-  User({required this.id, required this.username, required this.email});
+  User({
+    required this.id, 
+    required this.username, 
+    required this.email,
+    this.learningXP = 0,
+    this.currentStreak = 0,
+  });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
       username: json['username'],
       email: json['email'],
+      learningXP: json['learningXP'] ?? 0,
+      currentStreak: json['currentStreak'] ?? 0,
     );
   }
 }

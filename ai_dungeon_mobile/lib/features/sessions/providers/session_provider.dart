@@ -111,9 +111,8 @@ class SessionProvider extends ChangeNotifier {
       _errorMessage = 'Failed to rename session: $e';
       notifyListeners();
     }
-      notifyListeners();
-    }
   }
+
 
   Future<void> resetDailyQuota() async {
     _setLoading(true);

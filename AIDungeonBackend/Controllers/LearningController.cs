@@ -94,6 +94,38 @@ public class LearningController : ControllerBase
         return NoContent();
     }
     
+    [HttpPost("review")]
+    public async Task<IActionResult> ReviewCard([FromBody] ReviewRequestDto request)
+    {
+        var userId = GetUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return Unauthorized();
+
+        // 1. Award XP (Simple Logic for now)
+        int xpGain = 10;
+        user.LearningXP += xpGain;
+
+        // 2. Update Streak
+        var now = DateTime.UtcNow.Date;
+        if (user.LastStudyDate == null || user.LastStudyDate.Value.Date < now.AddDays(-1))
+        {
+            // First time or broken streak
+            user.CurrentStreak = 1;
+        }
+        else if (user.LastStudyDate.Value.Date == now.AddDays(-1))
+        {
+            // Continue streak
+            user.CurrentStreak++;
+        }
+        // If same day, streak doesn't increase, simply update date
+        
+        user.LastStudyDate = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        
+        return Ok(new UserStatsDto(user.LearningXP, user.CurrentStreak));
+    }
+
     private Guid GetUserId()
     {
          return Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
@@ -101,3 +133,5 @@ public class LearningController : ControllerBase
 }
 
 public record ExtractRequest(string Text);
+public record ReviewRequestDto(Guid CardId, int Rating);
+public record UserStatsDto(int LearningXP, int CurrentStreak);
