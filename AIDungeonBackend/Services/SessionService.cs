@@ -81,7 +81,12 @@ public class SessionService : ISessionService
         if (targetCards.Any())
         {
             var wordList = string.Join(", ", targetCards.Select(c => c.Word));
-            systemPrompt += $"\n\n[TARGET VOCABULARY]: {wordList}. Try to weave these words naturally into the narrative if they fit the context. Do not force them.";
+            Console.WriteLine($"[Active Usage] Injecting words: {wordList}"); // LOGGING
+            systemPrompt += $"\n\n[TARGET VOCABULARY]: {wordList}. You MUST weave at least one of these words naturally into the narrative. Bold the word like **this** when you use it.";
+        }
+        else
+        {
+            Console.WriteLine($"[Active Usage] No cards found for user {userId}"); // LOGGING
         }
 
         // [FORMAT ENFORCEMENT]

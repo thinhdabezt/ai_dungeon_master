@@ -58,7 +58,7 @@ class ChatBubble extends StatelessWidget {
                 ),
               )
             else
-              else
+
                 Builder(
                   builder: (context) {
                     // Pre-process content to bold matching words
