@@ -94,4 +94,17 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
+
+  void updateStats(int xp, int streak) {
+    if (_currentUser != null) {
+      _currentUser = User(
+        id: _currentUser!.id,
+        username: _currentUser!.username,
+        email: _currentUser!.email,
+        learningXP: xp,
+        currentStreak: streak,
+      );
+      notifyListeners();
+    }
+  }
 }

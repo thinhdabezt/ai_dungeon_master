@@ -19,6 +19,7 @@ import 'core/storage/cache_service.dart';
 import 'features/learning/services/learning_service.dart';
 import 'features/learning/providers/learning_provider.dart';
 import 'features/learning/screens/grimoire_screen.dart';
+import 'features/learning/screens/review_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,6 +97,10 @@ class AppRouter extends StatelessWidget {
         GoRoute(
           path: '/grimoire',
           builder: (context, state) => const GrimoireScreen(),
+        ),
+        GoRoute(
+          path: '/review',
+          builder: (context, state) => const ReviewScreen(),
         ),
       ],
     );

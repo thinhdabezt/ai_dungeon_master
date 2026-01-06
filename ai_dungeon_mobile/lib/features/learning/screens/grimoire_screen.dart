@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/learning_provider.dart';
 
 class GrimoireScreen extends StatefulWidget {
@@ -85,6 +86,11 @@ class _GrimoireScreenState extends State<GrimoireScreen> {
                     ).animate().fadeIn(delay: (50 * index).ms).slideX();
                   },
                 ),
+      floatingActionButton: provider.cards.isNotEmpty ? FloatingActionButton.extended(
+        onPressed: () => context.push('/review'),
+        icon: const Icon(Icons.school),
+        label: const Text('Review Words'),
+      ) : null,
     );
   }
 

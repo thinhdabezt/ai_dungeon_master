@@ -57,4 +57,18 @@ class LearningService {
       rethrow;
     }
   }
+  Future<Map<String, dynamic>> reviewCard(String cardId, int rating) async {
+    try {
+      final response = await _apiClient.dio.post(
+        '/learning/review',
+        data: {
+          'cardId': cardId,
+          'rating': rating,
+        },
+      );
+      return response.data; // Returns UserStatsDto { learningXP, currentStreak }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

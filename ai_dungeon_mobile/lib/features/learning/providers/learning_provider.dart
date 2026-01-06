@@ -55,4 +55,18 @@ class LearningProvider extends ChangeNotifier {
       throw e;
     }
   }
+  Future<Map<String, dynamic>> reviewCard(String cardId, int rating) async {
+    try {
+      final stats = await _service.reviewCard(cardId, rating);
+      // Optimistically update card nextReviewDate? 
+      // For now, we will just return stats. The Review Screen will handle moving to next card.
+      // Ideally we reload cards or update the specific card's review date if returned.
+      // But for Gamification focus (P3), we care about XP.
+      return stats;
+    } catch (e) {
+      _errorMessage = 'Failed to review card: $e';
+      notifyListeners();
+      rethrow;
+    }
+  }
 }
