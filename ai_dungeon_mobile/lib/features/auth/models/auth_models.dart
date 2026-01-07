@@ -19,6 +19,7 @@ class User {
   final int learningXP;
   final int currentStreak;
   final DateTime? lastStudyDate;
+  final String? avatarUrl;
 
   User({
     required this.id, 
@@ -27,6 +28,7 @@ class User {
     this.learningXP = 0,
     this.currentStreak = 0,
     this.lastStudyDate,
+    this.avatarUrl,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class User {
       learningXP: json['learningXP'] ?? 0,
       currentStreak: json['currentStreak'] ?? 0,
       lastStudyDate: json['lastStudyDate'] != null ? DateTime.parse(json['lastStudyDate']) : null,
+      avatarUrl: json['avatarUrl'], // Matches Backend DTO
     );
   }
 }

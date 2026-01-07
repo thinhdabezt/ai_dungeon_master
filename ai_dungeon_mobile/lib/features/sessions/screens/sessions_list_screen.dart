@@ -32,49 +32,13 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Your Adventures',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            Row(
-              children: [
-                Text(
-                  authProvider.currentUser?.username ?? 'Traveller',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Colors.white70,
-                      ),
-                ),
-                if (authProvider.currentUser != null) ...[
-                  const SizedBox(width: 8),
-                  Icon(Icons.auto_awesome, size: 12, color: Colors.purpleAccent),
-                  const SizedBox(width: 4),
-                  Text('${authProvider.currentUser!.learningXP} XP', style: TextStyle(fontSize: 10, color: Colors.purpleAccent)),
-                  
-                  const SizedBox(width: 8),
-                  Icon(Icons.local_fire_department, size: 12, color: Colors.orange),
-                  const SizedBox(width: 4),
-                  Text('${authProvider.currentUser!.currentStreak} Day Streak', style: TextStyle(fontSize: 10, color: Colors.orange)),
-                ]
-              ],
-            ),
-          ],
-        ),
+        title: const Text('Your Adventures'),
         actions: [
           IconButton(
             icon: const Icon(Icons.menu_book, color: Colors.amber),
             tooltip: 'The Grimoire',
             onPressed: () {
               context.push('/grimoire');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthProvider>().logout();
-              context.go('/login');
             },
           ),
         ],

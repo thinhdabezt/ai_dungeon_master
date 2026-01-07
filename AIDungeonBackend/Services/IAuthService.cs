@@ -7,4 +7,5 @@ public interface IAuthService
     Task<User?> RegisterAsync(string username, string email, string password);
     Task<(string? AccessToken, string? RefreshToken)> LoginAsync(string usernameOrEmail, string password);
     Task<bool> UpdateSettingsAsync(Guid userId, bool hintEnabled);
+    Task<User?> GetUserByIdAsync(Guid userId);
 }

@@ -39,15 +39,23 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult Me()
+    public async Task<IActionResult> Me()
     {
-        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
-        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
 
-        // Note: For now we don't return HintEnabled in /me, but we could.
-        // Let's stick to the essentials or update if frontend needs it.
-        return Ok(new { Id = userId, Username = username, Email = email });
+        var user = await _authService.GetUserByIdAsync(userId);
+        if (user == null) return NotFound("User not found.");
+
+        return Ok(new UserResponseDto(
+            user.Id,
+            user.Username,
+            user.Email,
+            user.LearningXP,
+            user.CurrentStreak,
+            user.LastStudyDate,
+            user.AvatarUrl
+        ));
     }
 
     [Authorize]
@@ -67,3 +75,4 @@ public class AuthController : ControllerBase
 public record RegisterDto(string Username, string Email, string Password);
 public record LoginDto(string UsernameOrEmail, string Password);
 public record UserSettingsDto(bool HintEnabled);
+public record UserResponseDto(Guid Id, string Username, string Email, int LearningXP, int CurrentStreak, DateTime? LastStudyDate, string? AvatarUrl);

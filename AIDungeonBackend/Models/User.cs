@@ -29,4 +29,7 @@ public class User
     public int LearningXP { get; set; } = 0;
     public int CurrentStreak { get; set; } = 0;
     public DateTime? LastStudyDate { get; set; }
+
+    // Profile (Phase 4)
+    public string? AvatarUrl { get; set; }
 }

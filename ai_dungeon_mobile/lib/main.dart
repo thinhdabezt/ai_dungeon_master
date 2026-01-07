@@ -13,6 +13,7 @@ import 'features/sessions/providers/session_provider.dart';
 import 'features/sessions/services/session_service.dart';
 import 'features/sessions/screens/sessions_list_screen.dart';
 import 'features/sessions/screens/new_session_screen.dart';
+import 'features/home/screens/main_screen.dart';
 import 'features/chat/providers/chat_provider.dart';
 import 'features/chat/screens/chat_screen.dart';
 import 'core/storage/cache_service.dart';
@@ -80,7 +81,7 @@ class AppRouter extends StatelessWidget {
         ),
         GoRoute(
           path: '/home',
-          builder: (context, state) => const SessionsListScreen(),
+          builder: (context, state) => const MainScreen(),
         ),
         GoRoute(
           path: '/sessions/new',
