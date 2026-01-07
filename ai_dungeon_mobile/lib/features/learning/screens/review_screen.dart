@@ -4,11 +4,52 @@ import 'flashcard_review_screen.dart';
 import 'matching_game_screen.dart';
 import 'memory_game_screen.dart';
 
+import 'package:provider/provider.dart';
+import '../../auth/providers/auth_provider.dart';
+
 class ReviewScreen extends StatelessWidget {
   const ReviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final user = authProvider.currentUser;
+    
+    // Check if review done today
+    bool isDailyReviewDone = false;
+    if (user?.lastStudyDate != null) {
+      final now = DateTime.now();
+      final last = user!.lastStudyDate!.toLocal();
+      if (now.year == last.year && now.month == last.month && now.day == last.day) {
+        isDailyReviewDone = true;
+      }
+    }
+
+    if (isDailyReviewDone) {
+       return Scaffold(
+        appBar: AppBar(title: const Text('Review Complete')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+               const Icon(Icons.check_circle, size: 80, color: Colors.green).animate().scale(),
+               const SizedBox(height: 24),
+               Text('Daily Limit Reached', style: Theme.of(context).textTheme.headlineMedium),
+               const SizedBox(height: 16),
+               const Text('You have gathered your mana for today.', style: TextStyle(color: Colors.white60)),
+               const SizedBox(height: 8),
+               const Text('Come back tomorrow for more XP!', style: TextStyle(color: Colors.white38)),
+               const SizedBox(height: 32),
+               ElevatedButton(
+                 onPressed: () => Navigator.pop(context),
+                 child: const Text('Return to Grimoire'),
+               ),
+            ],
+          ),
+        ),
+       );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Choose Your Trial')),
       body: Center(

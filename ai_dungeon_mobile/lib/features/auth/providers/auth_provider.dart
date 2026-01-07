@@ -103,6 +103,7 @@ class AuthProvider extends ChangeNotifier {
         email: _currentUser!.email,
         learningXP: xp,
         currentStreak: streak,
+        lastStudyDate: DateTime.now(), // Optimistic update
       );
       notifyListeners();
     }

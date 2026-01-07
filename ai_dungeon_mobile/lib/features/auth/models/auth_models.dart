@@ -18,6 +18,7 @@ class User {
   final String email;
   final int learningXP;
   final int currentStreak;
+  final DateTime? lastStudyDate;
 
   User({
     required this.id, 
@@ -25,6 +26,7 @@ class User {
     required this.email,
     this.learningXP = 0,
     this.currentStreak = 0,
+    this.lastStudyDate,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class User {
       email: json['email'],
       learningXP: json['learningXP'] ?? 0,
       currentStreak: json['currentStreak'] ?? 0,
+      lastStudyDate: json['lastStudyDate'] != null ? DateTime.parse(json['lastStudyDate']) : null,
     );
   }
 }
