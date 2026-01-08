@@ -79,12 +79,14 @@ public class SessionService : ISessionService
         systemPrompt += $"\n\n[INSTRUCTION]: Adjust your vocabulary and sentence structure to match IELTS Band {session.IeltsBand} proficiency. Ensure the complexity of the text aligns with this level.";
         
         // [TARGET VOCABULARY INJECTION - Learning Phase 4]
-        var targetCards = await _context.Flashcards
+        var allCards = await _context.Flashcards
             .Where(f => f.UserId == userId)
-            // Ideally pick "Due" cards, but for now random or just take some
-            .OrderBy(r => Guid.NewGuid()) // SQLite random order might need specific function, doing client side random for simplicity if small dataset, or just take latest
-            .Take(5)
             .ToListAsync();
+            
+        var targetCards = allCards
+            .OrderBy(r => Guid.NewGuid()) 
+            .Take(5)
+            .ToList();
 
         if (targetCards.Any())
         {

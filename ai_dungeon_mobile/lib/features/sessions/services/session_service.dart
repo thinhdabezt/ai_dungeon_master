@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../../../core/storage/cache_service.dart';
 import '../../../core/network/api_client.dart';
 import '../models/create_session_dto.dart';
@@ -102,15 +103,34 @@ class SessionService {
       );
       return response.data;
     } catch (e) {
-      rethrow;
+      throw _handleError(e);
     }
   }
+
   Future<void> resetQuota() async {
     try {
       await _apiClient.dio.post('/sessions/quota/reset');
     } catch (e) {
-      rethrow;
+      throw _handleError(e);
     }
+  }
+
+  String _handleError(dynamic error) {
+    if (error is DioException) {
+      if (error.response != null) {
+        // If the data is simply a string, return it.
+        // If it's a Map (JSON), try to find a 'message' or 'title' field.
+        final data = error.response?.data;
+        if (data is String) return data;
+        if (data is Map<String, dynamic>) {
+           if (data.containsKey('message')) return data['message'];
+           if (data.containsKey('title')) return data['title']; // Default problem details
+        }
+        return data?.toString() ?? 'Server error';
+      }
+      return 'Network error: ${error.message}';
+    }
+    return 'Unknown error: $error';
   }
 }
 

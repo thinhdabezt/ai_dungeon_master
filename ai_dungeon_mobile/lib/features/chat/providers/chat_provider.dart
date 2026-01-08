@@ -72,7 +72,7 @@ class ChatProvider extends ChangeNotifier {
       _messages.add(aiMsg);
       
     } catch (e) {
-      _errorMessage = 'Failed to send message: $e';
+      _errorMessage = e.toString();
       // Optionally remove the user message or mark as failed
     } finally {
       _isSending = false;

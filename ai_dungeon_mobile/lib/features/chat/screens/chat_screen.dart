@@ -54,6 +54,21 @@ class _ChatScreenState extends State<ChatScreen> {
     // Better to hook into the provider or check didUpdateWidget/listen.
     // For simplicity, we'll try to scroll on post-frame if not loading.
     
+    // Listen for errors
+    if (chatProvider.errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(chatProvider.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+        // We might want to clear the error so it doesn't show repeatedly, 
+        // but ChatProvider doesn't have a clearError method exposed nicely aside from reload.
+        // Ideally ChatProvider clears it after consumption or we add a method.
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title ?? 'Adventure'),

@@ -110,6 +110,25 @@ class ProfileScreen extends StatelessWidget {
               ),
             ).animate().fadeIn().slideY(begin: 0.1),
 
+            const SizedBox(height: 16),
+             Center(
+              child: TextButton(
+                onPressed: () async {
+                  try {
+                    await authProvider.resetDailyQuota();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Daily quota reset!')));
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+                    }
+                  }
+                },
+                child: const Text('Reset Daily Token Limit (Debug)', style: TextStyle(color: Colors.white30, fontSize: 10)),
+              ),
+            ),
+
             const SizedBox(height: 40),
 
             // Actions

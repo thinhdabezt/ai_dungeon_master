@@ -131,4 +131,23 @@ class AuthProvider extends ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<void> resetDailyQuota() async {
+    try {
+      // We need to call the endpoint. AuthService doesn't have it, SessionService does.
+      // Ideally AuthProvider shouldn't depend on SessionService for this, but the endpoint is under SessionController?
+      // Actually /api/auth users ResetQuota? No, it's /api/sessions/quota/reset in Backend SessionController.
+      // So we use _sessionService? AuthProvider doesn't have SessionService.
+      // I'll add the method to AuthService instead.
+      await _authService.resetQuota(); 
+       if (_currentUser != null) {
+        // Optimistically reset usage
+        // We don't have usage in the model yet, but if we did...
+        // Just notify.
+        notifyListeners();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

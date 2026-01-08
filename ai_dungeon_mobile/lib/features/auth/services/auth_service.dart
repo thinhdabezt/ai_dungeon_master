@@ -59,4 +59,13 @@ class AuthService {
       throw _handleError(e);
     }
   }
+
+  Future<void> resetQuota() async {
+    try {
+      // Using sessions endpoint from auth service is slightly dirty but convenient
+      await _apiClient.dio.post('/sessions/quota/reset');
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
 }
