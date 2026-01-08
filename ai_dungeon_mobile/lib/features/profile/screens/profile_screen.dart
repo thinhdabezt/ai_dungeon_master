@@ -45,9 +45,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   child: IconButton(
                     icon: const Icon(Icons.edit, size: 20),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Avatar editing coming soon!')));
-                    },
+                    onPressed: () => _showAvatarPicker(context, authProvider),
                     tooltip: 'Change Avatar',
                   ),
                 ),
@@ -163,6 +161,75 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  void _showAvatarPicker(BuildContext context, AuthProvider authProvider) {
+    final List<String> seeds = [
+      'Felix', 'Aneka', 'Zack', 'Midnight', 'Shadow', 'Luna', 'Grim', 'Sky', 'Ember'
+    ];
+    final TextEditingController customController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Choose your Guise'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemCount: seeds.length,
+                  itemBuilder: (context, index) {
+                    final seed = seeds[index];
+                    final url = 'https://api.dicebear.com/7.x/adventurer/png?seed=$seed';
+                    return GestureDetector(
+                      onTap: () {
+                         Navigator.pop(ctx);
+                         authProvider.updateAvatar(url);
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey.shade800,
+                        backgroundImage: NetworkImage(url),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                const Text('Or Enter Custom URL:', style: TextStyle(fontSize: 12, color: Colors.white54)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: customController,
+                  decoration: InputDecoration(
+                    hintText: 'https://example.com/image.png',
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.check),
+                      onPressed: () {
+                        if (customController.text.isNotEmpty) {
+                          Navigator.pop(ctx);
+                          authProvider.updateAvatar(customController.text);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+        ],
+      ),
     );
   }
 }

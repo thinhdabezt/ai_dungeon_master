@@ -49,4 +49,14 @@ class AuthService {
     }
     return 'Unknown error: $error';
   }
+
+  Future<void> updateAvatar(String avatarUrl) async {
+    try {
+      await _apiClient.dio.patch('/auth/avatar', data: {
+        'avatarUrl': avatarUrl,
+      });
+    } catch (e) {
+      throw _handleError(e);
+    }
+  }
 }

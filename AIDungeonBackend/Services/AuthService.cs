@@ -92,4 +92,17 @@ public class AuthService : IAuthService
     {
         return await _context.Users.FindAsync(userId);
     }
+
+    public async Task<bool> UpdateAvatarAsync(Guid userId, string avatarUrl)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        user.AvatarUrl = avatarUrl;
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

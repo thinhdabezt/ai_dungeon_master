@@ -70,9 +70,23 @@ public class AuthController : ControllerBase
 
         return Ok(new { Message = "Settings updated successfully." });
     }
+
+    [Authorize]
+    [HttpPatch("avatar")]
+    public async Task<IActionResult> UpdateAvatar([FromBody] UpdateAvatarDto dto)
+    {
+        var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userIdString, out var userId)) return Unauthorized();
+
+        var success = await _authService.UpdateAvatarAsync(userId, dto.AvatarUrl);
+        if (!success) return NotFound("User not found.");
+
+        return Ok(new { Message = "Avatar updated successfully.", AvatarUrl = dto.AvatarUrl });
+    }
 }
 
 public record RegisterDto(string Username, string Email, string Password);
 public record LoginDto(string UsernameOrEmail, string Password);
 public record UserSettingsDto(bool HintEnabled);
+public record UpdateAvatarDto(string AvatarUrl);
 public record UserResponseDto(Guid Id, string Username, string Email, int LearningXP, int CurrentStreak, DateTime? LastStudyDate, string? AvatarUrl);

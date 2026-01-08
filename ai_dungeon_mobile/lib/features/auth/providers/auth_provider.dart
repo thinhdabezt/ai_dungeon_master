@@ -108,4 +108,27 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> updateAvatar(String avatarUrl) async {
+    try {
+      await _authService.updateAvatar(avatarUrl);
+      // Optimistic update
+      if (_currentUser != null) {
+        _currentUser = User(
+          id: _currentUser!.id,
+          username: _currentUser!.username,
+          email: _currentUser!.email,
+          learningXP: _currentUser!.learningXP,
+          currentStreak: _currentUser!.currentStreak,
+          lastStudyDate: _currentUser!.lastStudyDate,
+          avatarUrl: avatarUrl,
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
 }

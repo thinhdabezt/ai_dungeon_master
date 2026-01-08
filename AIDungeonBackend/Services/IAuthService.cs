@@ -8,4 +8,5 @@ public interface IAuthService
     Task<(string? AccessToken, string? RefreshToken)> LoginAsync(string usernameOrEmail, string password);
     Task<bool> UpdateSettingsAsync(Guid userId, bool hintEnabled);
     Task<User?> GetUserByIdAsync(Guid userId);
+    Task<bool> UpdateAvatarAsync(Guid userId, string avatarUrl);
 }
