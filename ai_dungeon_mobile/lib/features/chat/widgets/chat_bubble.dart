@@ -7,12 +7,16 @@ class ChatBubble extends StatelessWidget {
   final MessageModel message;
   final VoidCallback? onInspect;
   final Set<String>? highlightWords;
+  final String? userAvatarUrl;
+  final IconData? dmIcon;
 
   const ChatBubble({
     super.key, 
     required this.message, 
     this.onInspect,
     this.highlightWords,
+    this.userAvatarUrl,
+    this.dmIcon,
   });
 
   @override
@@ -20,30 +24,48 @@ class ChatBubble extends StatelessWidget {
     final isUser = message.isUser;
     final theme = Theme.of(context);
 
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+    // Avatar Widget
+    Widget avatarWidget;
+    if (isUser) {
+      avatarWidget = CircleAvatar(
+        radius: 16,
+        backgroundColor: theme.primaryColorDark,
+        backgroundImage: userAvatarUrl != null ? NetworkImage(userAvatarUrl!) : null,
+        child: userAvatarUrl == null ? const Icon(Icons.person, size: 16, color: Colors.white) : null,
+      );
+    } else {
+      avatarWidget = CircleAvatar(
+        radius: 16,
+        backgroundColor: Colors.amber.withOpacity(0.2),
+        child: Icon(dmIcon ?? Icons.auto_awesome, size: 16, color: Colors.amber),
+      );
+    }
+
+    // Message Content contentWidget... 
+    // (We reuse the container logic but wrap in Row)
+    
+    Widget bubbleContent = Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         padding: const EdgeInsets.all(12),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.85,
+          maxWidth: MediaQuery.of(context).size.width * 0.75, // Reduced for avatar
         ),
         decoration: BoxDecoration(
           color: isUser 
               ? theme.primaryColor 
               : theme.cardColor,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: isUser ? const Radius.circular(16) : Radius.zero,
-            bottomRight: isUser ? Radius.zero : const Radius.circular(16),
+            topLeft: isUser ? const Radius.circular(16) : const Radius.circular(4),
+            topRight: isUser ? const Radius.circular(4) : const Radius.circular(16),
+            bottomLeft: const Radius.circular(16),
+            bottomRight: const Radius.circular(16),
           ),
           border: isUser ? null : Border.all(color: Colors.white.withOpacity(0.1)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(80),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
+              color: Colors.black.withAlpha(50),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -139,7 +161,23 @@ class ChatBubble extends StatelessWidget {
             ],
           ],
         ),
-      ),
+      );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: Row(
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isUser) ...[
+            Padding(padding: const EdgeInsets.only(top: 4), child: avatarWidget),
+          ],
+          bubbleContent,
+          if (isUser) ...[
+             Padding(padding: const EdgeInsets.only(top: 4), child: avatarWidget),
+          ],
+        ],
+      )
     ).animate().fade(duration: 300.ms).slideY(begin: 0.2);
   }
 }

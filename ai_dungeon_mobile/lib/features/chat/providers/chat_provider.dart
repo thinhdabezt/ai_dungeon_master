@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../sessions/services/session_service.dart';
 import '../models/message_model.dart';
+import '../../sessions/models/session_model.dart';
 
 class ChatProvider extends ChangeNotifier {
   final SessionService _sessionService;
@@ -12,15 +13,19 @@ class ChatProvider extends ChangeNotifier {
   String? _errorMessage;
   String? _currentSessionId;
 
+  SessionModel? _currentSession;
+
   ChatProvider(this._sessionService);
 
   List<MessageModel> get messages => _messages;
   bool get isLoading => _isLoading;
   bool get isSending => _isSending;
   String? get errorMessage => _errorMessage;
+  SessionModel? get currentSession => _currentSession;
 
   void setCurrentSession(String sessionId) {
     _currentSessionId = sessionId;
+    _currentSession = null; // Reset
     _messages = [];
     _errorMessage = null;
     _loadMessages();
@@ -31,6 +36,7 @@ class ChatProvider extends ChangeNotifier {
     _setLoading(true);
     try {
       final session = await _sessionService.getSession(_currentSessionId!);
+      _currentSession = session;
       _messages = session.messages;
       // Sort older to newer?
       _messages.sort((a, b) => a.timestamp.compareTo(b.timestamp));

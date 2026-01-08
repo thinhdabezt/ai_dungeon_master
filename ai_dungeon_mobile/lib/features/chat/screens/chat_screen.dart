@@ -6,6 +6,8 @@ import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input.dart';
 import '../../learning/widgets/extraction_bottom_sheet.dart';
 import '../../learning/providers/learning_provider.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../../core/utils/theme_utils.dart';
 
 class ChatScreen extends StatefulWidget {
   final String sessionId;
@@ -101,10 +103,14 @@ class _ChatScreenState extends State<ChatScreen> {
                              );
                           }
                           final learningProvider = context.watch<LearningProvider>();
+                          final authProvider = context.watch<AuthProvider>();
+                          final themeKey = chatProvider.currentSession?.themeKey ?? 'classic_high_fantasy';
                           
                           return ChatBubble(
                             message: chatProvider.messages[index],
                             highlightWords: learningProvider.cards.map((c) => c.word).toSet(),
+                            userAvatarUrl: authProvider.currentUser?.avatarUrl,
+                            dmIcon: ThemeUtils.getThemeIcon(themeKey),
                             onInspect: () {
                               showModalBottomSheet(
                                 context: context,
